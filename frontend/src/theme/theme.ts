@@ -101,9 +101,13 @@ const baseThemeOptions: ThemeOptions = {
       },
       styleOverrides: {
         root: {
-          paddingLeft: 24,
-          paddingRight: 24,
+          paddingLeft: 16,
+          paddingRight: 16,
           "@media (min-width:600px)": {
+            paddingLeft: 24,
+            paddingRight: 24,
+          },
+          "@media (min-width:900px)": {
             paddingLeft: 32,
             paddingRight: 32,
           },
@@ -120,6 +124,9 @@ const baseThemeOptions: ThemeOptions = {
           borderRadius: radius.lg,
           padding: "10px 22px",
           transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+          "@media (pointer: coarse)": {
+            minHeight: 44,
+          },
           "&.MuiButton-contained.MuiButton-colorPrimary": {
             backgroundImage: gradients.primary,
             boxShadow: `${shadows.md}, ${shadows.glow}`,
@@ -142,6 +149,10 @@ const baseThemeOptions: ThemeOptions = {
           padding: "14px 28px",
           fontSize: "1rem",
           borderRadius: radius.xl,
+          "@media (pointer: coarse)": {
+            minHeight: 48,
+            padding: "16px 28px",
+          },
         },
         sizeSmall: {
           padding: "6px 16px",
@@ -292,6 +303,28 @@ const baseThemeOptions: ThemeOptions = {
         },
         outlined: {
           borderColor: glass.border,
+        },
+      },
+    },
+
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          "@media (pointer: coarse)": {
+            minWidth: 44,
+            minHeight: 44,
+            padding: 10,
+          },
+        },
+      },
+    },
+
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          "@media (pointer: coarse)": {
+            minHeight: 48,
+          },
         },
       },
     },

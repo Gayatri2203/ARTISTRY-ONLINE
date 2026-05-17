@@ -1,0 +1,128 @@
+"use client";
+
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Link from "next/link";
+import { memo } from "react";
+
+import { MotionBox } from "@/src/components/ui";
+import { scaleIn } from "@/src/lib/motion";
+import { tapLinkStyle } from "@/src/components/ui/styles";
+
+import { ArtistMeta } from "./ArtistMeta";
+import { ArtworkCategoryTags } from "./ArtworkCategoryTags";
+import { ArtworkHoverOverlay } from "./ArtworkHoverOverlay";
+import { ArtworkMetrics } from "./ArtworkMetrics";
+import { TrendingRankBadge } from "./TrendingRankBadge";
+import type { TrendingArtwork } from "./types";
+
+export type TrendingArtworkCardProps = {
+  artwork: TrendingArtwork;
+  featured?: boolean;
+};
+
+function TrendingArtworkCardComponent({
+  artwork,
+  featured = false,
+}: TrendingArtworkCardProps) {
+  const mediaHeight = featured
+    ? { xs: 280, sm: 360, md: 420 }
+    : { xs: 200, sm: 220, md: 240 };
+
+  return (
+    <MotionBox
+      variants={scaleIn}
+      sx={{ height: "100%" }}
+    >
+      <Link href={`/explore/${artwork.id}`} style={tapLinkStyle}>
+        <Box
+          className="artwork-card-root"
+          sx={{
+            position: "relative",
+            height: "100%",
+            borderRadius: 3,
+            overflow: "hidden",
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "rgba(255,255,255,0.08)",
+            transition: "border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease",
+            "@media (hover: hover)": {
+              "&:hover": {
+                borderColor: "rgba(255,255,255,0.16)",
+                boxShadow: (theme) =>
+                  `${theme.palette.artistry.shadows.lg}, ${theme.palette.artistry.shadows.glow}`,
+                transform: "translateY(-4px)",
+              },
+            },
+          }}
+        >
+          <Box
+            sx={{
+              position: "relative",
+              height: mediaHeight,
+              background: artwork.gradient,
+              overflow: "hidden",
+            }}
+          >
+            <TrendingRankBadge rank={artwork.rank} />
+            {artwork.featuredTag && (
+              <Chip
+                label={artwork.featuredTag}
+                size="small"
+                sx={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  zIndex: 2,
+                  fontWeight: 600,
+                  bgcolor: "rgba(0,0,0,0.45)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                }}
+              />
+            )}
+            <ArtworkHoverOverlay title={artwork.title} price={artwork.price} />
+          </Box>
+
+          <Stack spacing={1.5} sx={{ p: { xs: 2, sm: 2.5 } }}>
+            <Typography
+              variant={featured ? "h5" : "h6"}
+              sx={{ fontWeight: 700, lineHeight: 1.2 }}
+              noWrap
+            >
+              {artwork.title}
+            </Typography>
+            <ArtistMeta
+              artist={artwork.artist}
+              avatarSize={featured ? 40 : 32}
+              nameVariant={featured ? "subtitle1" : "subtitle2"}
+            />
+            <ArtworkCategoryTags categories={artwork.categories} />
+            <Stack
+              direction="row"
+              sx={{
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 1,
+              }}
+            >
+              <ArtworkMetrics likes={artwork.likes} views={artwork.views} />
+              <Typography
+                variant="subtitle1"
+                color="secondary.main"
+                sx={{ fontWeight: 700 }}
+              >
+                {artwork.price}
+              </Typography>
+            </Stack>
+          </Stack>
+        </Box>
+      </Link>
+    </MotionBox>
+  );
+}
+
+export const TrendingArtworkCard = memo(TrendingArtworkCardComponent);

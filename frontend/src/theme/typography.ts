@@ -44,7 +44,7 @@ export const typography: TypographyVariantsOptions = {
   h4: {
     fontFamily: fontFamily.display,
     fontWeight: fontWeight.semibold,
-    fontSize: "1.375rem",
+    fontSize: "clamp(1.25rem, 2.5vw + 0.5rem, 1.375rem)",
     lineHeight: 1.25,
     letterSpacing: "-0.015em",
   },
@@ -74,7 +74,7 @@ export const typography: TypographyVariantsOptions = {
   },
 
   body1: {
-    fontSize: "1rem",
+    fontSize: "clamp(0.9375rem, 1.5vw + 0.75rem, 1rem)",
     lineHeight: 1.65,
     fontWeight: fontWeight.regular,
   },
@@ -113,9 +113,9 @@ export const textStyles = {
   hero: {
     fontFamily: fontFamily.display,
     fontWeight: fontWeight.bold,
-    fontSize: "clamp(2.5rem, 6vw, 4rem)",
-    lineHeight: 1.05,
-    letterSpacing: "-0.04em",
+    fontSize: "clamp(2rem, 5vw + 0.75rem, 4rem)",
+    lineHeight: { xs: 1.08, sm: 1.05 },
+    letterSpacing: { xs: "-0.03em", md: "-0.04em" },
     background: "linear-gradient(135deg, #F8FAFC 0%, #94A3B8 100%)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",

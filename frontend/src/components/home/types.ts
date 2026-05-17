@@ -1,45 +1,38 @@
-import type { ReactNode } from "react";
+export type MasonrySize = "tall" | "standard" | "wide";
 
-export type NavLink = {
-  label: string;
-  href: string;
-};
-
-export type StatItem = {
-  value: string;
-  label: string;
-  icon?: ReactNode;
-};
-
-export type FloatingCard = {
-  title: string;
-  subtitle: string;
-  position: { top?: string; bottom?: string; left?: string; right?: string };
-  delay?: number;
-};
-
-export type CategoryItem = {
+export type ArtistProfile = {
   id: string;
-  label: string;
-  count: string;
-  gradient: string;
-  iconName: "brush" | "digital" | "photo" | "sculpture";
+  name: string;
+  /** CSS gradient for avatar placeholder */
+  avatarGradient: string;
 };
 
-export type ArtworkItem = {
+export type ExploreArtwork = {
   id: string;
   title: string;
-  artist: string;
+  artist: ArtistProfile;
   price: string;
-  tag: string;
+  categories: string[];
   gradient: string;
-  likes?: number;
+  likes: number;
+  views: number;
+  masonrySize: MasonrySize;
+  featuredTag?: string;
 };
 
-export type HeroShowcase = {
-  title: string;
-  artist: string;
-  price: string;
+export type TrendingArtwork = ExploreArtwork & {
+  rank: 1 | 2 | 3;
+};
+
+export type ExploreCategoryFilter = {
+  id: string;
   label: string;
-  gradient: string;
+};
+
+export type ExploreSortOption = "trending" | "newest" | "most-liked" | "most-viewed";
+
+export type ExploreFiltersState = {
+  query: string;
+  categoryId: string | null;
+  sort: ExploreSortOption;
 };
