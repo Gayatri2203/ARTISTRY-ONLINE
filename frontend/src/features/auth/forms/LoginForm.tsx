@@ -5,6 +5,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -21,6 +22,7 @@ import { zodResolver } from "../lib/zodResolver";
 import { loginSchema, type LoginFormValues } from "../schemas";
 
 export default function LoginForm() {
+  const router = useRouter();
   const [socialLoading, setSocialLoading] = useState(false);
 
   const {
@@ -36,6 +38,10 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormValues) => {
     await new Promise((resolve) => setTimeout(resolve, 1200));
     toast.success(`Welcome back! Signed in as ${data.email}`);
+    
+    // Extract username from email (part before @)
+    const username = data.email.split('@')[0];
+    router.push(`/profile/${username}`);
   };
 
   const handleSocialLogin = async (provider: string) => {
