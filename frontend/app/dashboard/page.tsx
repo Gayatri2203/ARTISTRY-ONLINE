@@ -5,6 +5,8 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 
+import { ProtectedRoute } from "@/src/components/auth/ProtectedRoute";
+import { AppShell } from "@/src/components/layout/AppShell";
 import { DashboardSidebar } from "@/src/components/dashboard/DashboardSidebar";
 import { StatsCards } from "@/src/components/dashboard/StatsCards";
 import { RecentActivity } from "@/src/components/dashboard/RecentActivity";
@@ -15,9 +17,9 @@ import { ChartPlaceholder } from "@/src/components/dashboard/ChartPlaceholder";
 
 import { fadeInUp, staggerContainer } from "@/src/lib/motion";
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", minHeight: "100%" }}>
       <DashboardSidebar />
 
       <Box sx={{ flex: 1, p: 3 }}>
@@ -84,5 +86,15 @@ export default function DashboardPage() {
         </motion.div>
       </Box>
     </Box>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <AppShell>
+        <DashboardPageContent />
+      </AppShell>
+    </ProtectedRoute>
   );
 }

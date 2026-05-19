@@ -10,6 +10,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -24,14 +26,17 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
+import { useAuthStore } from "@/src/store/authStore";
+import { ROUTES } from "@/src/lib/constants";
 
 export function DashboardSidebar() {
+  const pathname = usePathname();
+  const { user } = useAuthStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [activeItem, setActiveItem] = useState("Overview");
 
   const menuItems = [
     { icon: <DashboardIcon />, label: "Overview", href: "/dashboard" },
-    { icon: <PaletteIcon />, label: "My Artworks", href: "/dashboard/artworks" },
+    { icon: <PaletteIcon />, label: "My Artworks", href: user ? ROUTES.profile(user.username) : "/login" },
     { icon: <FavoriteIcon />, label: "Wishlist", href: "/dashboard/wishlist" },
     { icon: <ShoppingBagIcon />, label: "Orders", href: "/dashboard/orders" },
     { icon: <ShoppingCartIcon />, label: "Cart", href: "/dashboard/cart" },
@@ -152,8 +157,9 @@ export function DashboardSidebar() {
           >
             <ListItem disablePadding sx={{ mb: 1 }}>
               <ListItemButton
-                onClick={() => setActiveItem(item.label)}
-                selected={activeItem === item.label}
+                component={Link}
+                href={item.href}
+                selected={pathname === item.href}
                 sx={{
                   borderRadius: "12px",
                   px: 2,
@@ -170,7 +176,7 @@ export function DashboardSidebar() {
               >
                 <ListItemIcon
                   sx={{
-                    color: activeItem === item.label ? "primary.light" : "text.secondary",
+                    color: pathname === item.href ? "primary.light" : "text.secondary",
                     minWidth: isCollapsed ? "auto" : 40,
                     justifyContent: isCollapsed ? "center" : "flex-start",
                   }}
@@ -188,8 +194,8 @@ export function DashboardSidebar() {
                         primary={item.label}
                         sx={{
                           "& .MuiTypography-root": {
-                            fontWeight: activeItem === item.label ? 600 : 400,
-                            color: activeItem === item.label ? "text.primary" : "text.secondary",
+                            fontWeight: pathname === item.href ? 600 : 400,
+                            color: pathname === item.href ? "text.primary" : "text.secondary",
                           },
                         }}
                       />

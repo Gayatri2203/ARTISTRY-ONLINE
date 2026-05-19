@@ -8,10 +8,18 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
+import { useUploadContext } from "@/src/features/upload/UploadContext";
 
 export function DragDropUpload() {
+  const { setImageFile } = useUploadContext();
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+
+  const setFiles = (files: File[]) => {
+    const imageFiles = files.filter((f) => f.type.startsWith("image/"));
+    setUploadedFiles(imageFiles);
+    setImageFile(imageFiles[0] ?? null);
+  };
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -29,14 +37,12 @@ export function DragDropUpload() {
     setIsDragging(false);
 
     const files = Array.from(e.dataTransfer.files);
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-    setUploadedFiles((prev) => [...prev, ...imageFiles]);
-  }, []);
+    setFiles(files);
+  }, [setImageFile]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-    setUploadedFiles((prev) => [...prev, ...imageFiles]);
+    setFiles(files);
   };
 
   return (

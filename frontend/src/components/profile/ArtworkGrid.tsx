@@ -2,6 +2,7 @@
 
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
+import Link from "next/link";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
@@ -9,6 +10,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
+import { ROUTES } from "@/src/lib/constants";
 import { hoverLift } from "@/src/lib/motion";
 
 export function ArtworkGrid() {
@@ -51,12 +53,15 @@ export function ArtworkGrid() {
             whileHover={hoverLift}
           >
             <Card
+              component={Link}
+              href={ROUTES.artwork(String(artwork.id))}
               sx={{
                 borderRadius: "16px",
                 overflow: "hidden",
                 background: "rgba(255, 255, 255, 0.02)",
                 border: "1px solid rgba(255, 255, 255, 0.08)",
                 transition: "all 0.3s ease",
+                textDecoration: "none",
                 "&:hover": {
                   borderColor: "rgba(255, 255, 255, 0.2)",
                   boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",

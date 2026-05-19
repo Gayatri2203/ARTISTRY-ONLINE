@@ -6,6 +6,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -19,9 +20,14 @@ import PasswordField from "../components/PasswordField";
 import { SocialLoginButtons } from "../components/SocialLoginButtons";
 import SubmitButton from "../components/SubmitButton";
 import { zodResolver } from "../lib/zodResolver";
+import { ROUTES } from "@/src/lib/constants";
+import { useAuthStore } from "@/src/store/authStore";
+
 import { signupSchema, type SignupFormValues } from "../schemas";
 
 export default function SignupForm() {
+  const router = useRouter();
+  const { register: registerUser, isLoading: authLoading } = useAuthStore();
   const [socialLoading, setSocialLoading] = useState(false);
 
   const {
@@ -40,8 +46,18 @@ export default function SignupForm() {
   });
 
   const onSubmit = async (data: SignupFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1400));
-    toast.success(`Account created. Welcome, ${data.name.split(" ")[0]}!`);
+    const username = data.name.trim().replace(/\s+/g, "_").toLowerCase();
+    try {
+      await registerUser({
+        username,
+        email: data.email,
+        password: data.password,
+      });
+      toast.success(`Account created. Welcome, ${data.name.split(" ")[0]}!`);
+      router.push(ROUTES.dashboard);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Registration failed");
+    }
   };
 
   const handleSocialLogin = async (provider: string) => {
@@ -174,7 +190,7 @@ export default function SignupForm() {
           .
         </Typography>
 
-        <SubmitButton loading={isSubmitting} loadingText="Creating account…">
+        <SubmitButton loading={isSubmitting || authLoading} loadingText="Creating account…">
           Create account
         </SubmitButton>
       </Stack>

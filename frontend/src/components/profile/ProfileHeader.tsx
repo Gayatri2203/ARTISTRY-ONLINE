@@ -9,14 +9,19 @@ import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
+import Link from "next/link";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
+import { ROUTES } from "@/src/lib/constants";
+import { useAuthStore } from "@/src/store/authStore";
 
 interface ProfileHeaderProps {
   username: string;
 }
 
 export function ProfileHeader({ username }: ProfileHeaderProps) {
+  const { user, isAuthenticated } = useAuthStore();
+  const isOwnProfile = isAuthenticated && user?.username === username;
   return (
     <Box sx={{ position: "relative", mb: 4 }}>
       {/* Cover Banner */}
@@ -142,8 +147,11 @@ export function ProfileHeader({ username }: ProfileHeaderProps) {
               Digital Artist & Collector
             </Typography>
             <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+              {isOwnProfile && (
               <Button
                 variant="gradient"
+                component={Link}
+                href={ROUTES.profileEdit}
                 startIcon={<EditOutlinedIcon />}
                 sx={{
                   borderRadius: "12px",
@@ -154,6 +162,7 @@ export function ProfileHeader({ username }: ProfileHeaderProps) {
               >
                 Edit Profile
               </Button>
+              )}
               <Button
                 variant="glass"
                 sx={{

@@ -5,13 +5,16 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 
+import { ProtectedRoute } from "@/src/components/auth/ProtectedRoute";
+import { AppShell } from "@/src/components/layout/AppShell";
 import { DragDropUpload } from "@/src/components/upload/DragDropUpload";
 import { ArtworkForm } from "@/src/components/upload/ArtworkForm";
 import { ArtworkPreview } from "@/src/components/upload/ArtworkPreview";
+import { UploadProvider } from "@/src/features/upload/UploadContext";
 
 import { fadeInUp, staggerContainer } from "@/src/lib/motion";
 
-export default function UploadPage() {
+function UploadPageContent() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <motion.div
@@ -63,5 +66,17 @@ export default function UploadPage() {
         </Box>
       </motion.div>
     </Container>
+  );
+}
+
+export default function UploadPage() {
+  return (
+    <ProtectedRoute>
+      <AppShell>
+        <UploadProvider>
+          <UploadPageContent />
+        </UploadProvider>
+      </AppShell>
+    </ProtectedRoute>
   );
 }

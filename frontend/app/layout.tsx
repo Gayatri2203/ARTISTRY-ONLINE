@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import ThemeRegistry from "@/src/theme/ThemeRegistry";
+import { AuthInitializer } from "@/src/components/auth/AuthInitializer";
 
 import "./globals.css";
 
@@ -38,7 +39,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <ThemeRegistry>{children}</ThemeRegistry>
+        <ThemeRegistry>
+          <AuthInitializer>
+            {children}
+          </AuthInitializer>
+        </ThemeRegistry>
       </body>
     </html>
   );

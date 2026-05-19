@@ -8,10 +8,20 @@ import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import PersonIcon from "@mui/icons-material/Person";
 import VerifiedIcon from "@mui/icons-material/Verified";
+import Link from "next/link";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
+import { ROUTES } from "@/src/lib/constants";
 
-export function ArtistInfo() {
+export type ArtistInfoProps = {
+  artistUsername?: string;
+  artistName?: string;
+};
+
+export function ArtistInfo({
+  artistUsername = "johndoe",
+  artistName = "John Doe",
+}: ArtistInfoProps) {
   return (
     <GlassCard sx={{ p: 3, mb: 3 }}>
       <Box
@@ -40,13 +50,17 @@ export function ArtistInfo() {
         <Box sx={{ flex: 1 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
             <Typography
+              component={Link}
+              href={ROUTES.profile(artistUsername)}
               variant="h6"
               sx={{
                 fontWeight: 700,
                 color: "text.primary",
+                textDecoration: "none",
+                "&:hover": { textDecoration: "underline" },
               }}
             >
-              John Doe
+              {artistName}
             </Typography>
             <VerifiedIcon sx={{ fontSize: 20, color: "primary.light" }} />
           </Box>

@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import { use } from "react";
 import { motion } from "framer-motion";
 
+import { AppShell } from "@/src/components/layout/AppShell";
 import { ArtworkPreview } from "@/src/components/artwork/ArtworkPreview";
 import { ArtistInfo } from "@/src/components/artwork/ArtistInfo";
 import { ArtworkDetails } from "@/src/components/artwork/ArtworkDetails";
@@ -32,6 +33,7 @@ export default function ArtworkDetailsPage({ params }: { params: Promise<{ id: s
   }
 
   return (
+    <AppShell>
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <motion.div
         variants={staggerContainer}
@@ -70,7 +72,7 @@ export default function ArtworkDetailsPage({ params }: { params: Promise<{ id: s
             </motion.div>
 
             <motion.div variants={fadeInUp}>
-              <ArtistInfo />
+              <ArtistInfo artistUsername="johndoe" artistName="John Doe" />
             </motion.div>
 
             <motion.div variants={fadeInUp}>
@@ -98,5 +100,6 @@ export default function ArtworkDetailsPage({ params }: { params: Promise<{ id: s
         </Box>
       </motion.div>
     </Container>
+    </AppShell>
   );
 }

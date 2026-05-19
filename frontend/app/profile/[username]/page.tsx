@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import { use, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { AppShell } from "@/src/components/layout/AppShell";
 import { ProfileHeader } from "@/src/components/profile/ProfileHeader";
 import { ProfileStats } from "@/src/components/profile/ProfileStats";
 import { BioSection } from "@/src/components/profile/BioSection";
@@ -137,6 +138,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   };
 
   return (
+    <AppShell>
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <motion.div
         variants={staggerContainer}
@@ -195,5 +197,6 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         <FloatingStatsCard />
       </motion.div>
     </Container>
+    </AppShell>
   );
 }

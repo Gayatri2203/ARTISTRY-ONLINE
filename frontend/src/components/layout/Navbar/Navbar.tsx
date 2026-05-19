@@ -10,13 +10,16 @@ import Toolbar from "@mui/material/Toolbar";
 import { AuthNavButtons } from "@/src/components/layout/Navbar/AuthNavButtons";
 import { DesktopNavLinks } from "@/src/components/layout/Navbar/DesktopNavLinks";
 import { MobileNavDrawer } from "@/src/components/layout/Navbar/MobileNavDrawer";
+import { ProfileMenu } from "@/src/components/layout/Navbar/ProfileMenu";
 import Logo from "@/src/components/layout/Logo";
 import { NAV_LINKS } from "@/src/features/landing/data";
 import { useMobileNav } from "@/src/hooks/useMobileNav";
+import { useAuthStore } from "@/src/store/authStore";
 import { touchIconButton } from "@/src/theme/responsive";
 
 export default function Navbar() {
   const { isOpen, open, close } = useMobileNav();
+  const { isAuthenticated, user } = useAuthStore();
 
   return (
     <>
@@ -44,9 +47,13 @@ export default function Navbar() {
             <Stack
               direction="row"
               spacing={1}
-              sx={{ ml: "auto", display: { xs: "none", md: "flex" } }}
+              sx={{ ml: "auto", display: { xs: "none", md: "flex" }, alignItems: "center" }}
             >
-              <AuthNavButtons />
+              {isAuthenticated ? (
+                <ProfileMenu />
+              ) : (
+                <AuthNavButtons />
+              )}
             </Stack>
 
             <IconButton
@@ -65,7 +72,13 @@ export default function Navbar() {
         </Container>
       </AppBar>
 
-      <MobileNavDrawer links={NAV_LINKS} open={isOpen} onClose={close} />
+      <MobileNavDrawer
+        links={NAV_LINKS}
+        open={isOpen}
+        onClose={close}
+        isLoggedIn={isAuthenticated}
+        username={user?.username}
+      />
     </>
   );
 }

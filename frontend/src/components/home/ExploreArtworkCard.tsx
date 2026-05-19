@@ -27,7 +27,7 @@ function ExploreArtworkCardComponent({ artwork }: ExploreArtworkCardProps) {
 
   return (
     <MotionBox variants={staggerItem} sx={{ breakInside: "avoid", mb: 2.5 }}>
-      <Link href={`/explore/${artwork.id}`} style={tapLinkStyle}>
+      <Link href={`/artwork/${artwork.id}`} style={tapLinkStyle}>
         <Box
           className="artwork-card-root"
           sx={{

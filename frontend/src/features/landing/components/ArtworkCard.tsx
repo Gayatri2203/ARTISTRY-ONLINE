@@ -12,6 +12,7 @@ import { GlassCard, LikeBadge, tapLinkStyle } from "@/src/components/ui";
 import type { ArtworkItem } from "../types";
 
 function ArtworkCardComponent({
+  id,
   title,
   artist,
   price,
@@ -20,7 +21,7 @@ function ArtworkCardComponent({
   likes = 0,
 }: ArtworkItem) {
   return (
-    <Link href="/explore" style={tapLinkStyle}>
+    <Link href={id ? `/artwork/${id}` : "/explore"} style={tapLinkStyle}>
       <GlassCard sx={{ overflow: "hidden", height: "100%" }}>
         <Box
           sx={{
