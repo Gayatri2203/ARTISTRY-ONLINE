@@ -5,6 +5,8 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { Toaster } from "react-hot-toast";
 
+import { AuthInitializer } from "@/src/components/auth/AuthInitializer";
+
 import theme from "./theme";
 
 export default function ThemeRegistry({
@@ -16,7 +18,7 @@ export default function ThemeRegistry({
     <AppRouterCacheProvider options={{ enableCssLayer: true }}>
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />
-        {children}
+        <AuthInitializer>{children}</AuthInitializer>
         <Toaster
           position="top-center"
           toastOptions={{

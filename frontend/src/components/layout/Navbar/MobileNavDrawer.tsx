@@ -14,6 +14,7 @@ import Link from "next/link";
 import { memo } from "react";
 
 import { AuthNavButtons } from "@/src/components/layout/Navbar/AuthNavButtons";
+import { ProfileMenu } from "@/src/components/layout/Navbar/ProfileMenu";
 import Logo from "@/src/components/layout/Logo";
 import type { NavLink } from "@/src/features/landing/types";
 import { touchIconButton } from "@/src/theme/responsive";
@@ -24,9 +25,17 @@ export type MobileNavDrawerProps = {
   links: readonly NavLink[];
   open: boolean;
   onClose: () => void;
+  isLoggedIn?: boolean;
+  username?: string;
 };
 
-function MobileNavDrawerComponent({ links, open, onClose }: MobileNavDrawerProps) {
+function MobileNavDrawerComponent({
+  links,
+  open,
+  onClose,
+  isLoggedIn = false,
+  username = "user",
+}: MobileNavDrawerProps) {
   return (
     <Drawer
       anchor="right"
@@ -126,12 +135,18 @@ function MobileNavDrawerComponent({ links, open, onClose }: MobileNavDrawerProps
           spacing={1.5}
           sx={{ p: { xs: 2, sm: 2.5 }, borderTop: 1, borderColor: "divider" }}
         >
-          <AuthNavButtons
-            size="large"
-            fullWidth
-            orientation="vertical"
-            onNavigate={onClose}
-          />
+          {isLoggedIn ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
+              <ProfileMenu />
+            </Box>
+          ) : (
+            <AuthNavButtons
+              size="large"
+              fullWidth
+              orientation="vertical"
+              onNavigate={onClose}
+            />
+          )}
         </Stack>
       </Box>
     </Drawer>

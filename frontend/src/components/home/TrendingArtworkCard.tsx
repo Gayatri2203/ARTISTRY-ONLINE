@@ -36,7 +36,7 @@ function TrendingArtworkCardComponent({
       variants={scaleIn}
       sx={{ height: "100%" }}
     >
-      <Link href={`/explore/${artwork.id}`} style={tapLinkStyle}>
+      <Link href={`/artwork/${artwork.id}`} style={tapLinkStyle}>
         <Box
           className="artwork-card-root"
           sx={{

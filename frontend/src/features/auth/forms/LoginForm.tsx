@@ -5,7 +5,8 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import {
@@ -23,9 +24,16 @@ import PasswordField from "../components/PasswordField";
 import { SocialLoginButtons } from "../components/SocialLoginButtons";
 import SubmitButton from "../components/SubmitButton";
 import { zodResolver } from "../lib/zodResolver";
+import { useAuthStore } from "@/src/store/authStore";
+import { ROUTES } from "@/src/lib/constants";
+
 import { loginSchema, type LoginFormValues } from "../schemas";
 
-export default function LoginForm() {
+function LoginFormInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") ?? ROUTES.dashboard;
+  const { login, isLoading: authLoading } = useAuthStore();
   const [socialLoading, setSocialLoading] = useState(false);
 
   const {
@@ -40,6 +48,7 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
+<<<<<<< HEAD
   
       await signInWithEmailAndPassword(
         auth,
@@ -56,6 +65,13 @@ export default function LoginForm() {
       console.log(error);
   
       toast.error(error.message);
+=======
+      await login({ email: data.email, password: data.password });
+      toast.success(`Welcome back! Signed in as ${data.email}`);
+      router.push(redirect);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Login failed");
+>>>>>>> origin/new
     }
   };
 
@@ -136,7 +152,7 @@ export default function LoginForm() {
           Forgot password?
         </Typography>
 
-        <SubmitButton loading={isSubmitting} loadingText="Signing in…">
+        <SubmitButton loading={isSubmitting || authLoading} loadingText="Signing in…">
           Sign in
         </SubmitButton>
       </Stack>
@@ -153,5 +169,13 @@ export default function LoginForm() {
         href="/signup"
       />
     </AuthGlassCard>
+  );
+}
+
+export default function LoginForm() {
+  return (
+    <Suspense fallback={null}>
+      <LoginFormInner />
+    </Suspense>
   );
 }

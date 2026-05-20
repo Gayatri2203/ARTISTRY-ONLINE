@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import ThemeRegistry from "@/src/theme/ThemeRegistry";
+import { AuthInitializer } from "@/src/components/auth/AuthInitializer";
 
 import "./globals.css";
 import { AuthProvider } from "@/src/context/AuthContext";
@@ -38,11 +39,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+    
      <body className="min-h-full flex flex-col">
   <AuthProvider>
     <ThemeRegistry>{children}</ThemeRegistry>
   </AuthProvider>
 </body>
+
     </html>
   );
 }
