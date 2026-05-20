@@ -9,6 +9,16 @@ import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import {
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+
+import {
+  doc,
+  setDoc,
+} from "firebase/firestore";
+
+import { auth, db } from "@/src/lib/firebase";
 
 import AuthDivider from "../components/AuthDivider";
 import AuthFooterLink from "../components/AuthFooterLink";
@@ -40,8 +50,38 @@ export default function SignupForm() {
   });
 
   const onSubmit = async (data: SignupFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1400));
-    toast.success(`Account created. Welcome, ${data.name.split(" ")[0]}!`);
+    try {
+  
+      const userCredential =
+        await createUserWithEmailAndPassword(
+          auth,
+          data.email,
+          data.password
+        );
+  
+      const user = userCredential.user;
+  
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          name: data.name,
+          email: data.email,
+          createdAt: new Date(),
+          bio: "",
+          profileImage: "",
+        }
+      );
+  
+      toast.success(
+        `Account created. Welcome, ${data.name.split(" ")[0]}!`
+      );
+  
+    } catch (error: any) {
+  
+      console.log(error);
+  
+      toast.error(error.message);
+    }
   };
 
   const handleSocialLogin = async (provider: string) => {

@@ -8,6 +8,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import {
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+
+import { auth } from "@/src/lib/firebase";
 
 import AuthDivider from "../components/AuthDivider";
 import AuthFooterLink from "../components/AuthFooterLink";
@@ -34,8 +39,24 @@ export default function LoginForm() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    toast.success(`Welcome back! Signed in as ${data.email}`);
+    try {
+  
+      await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+  
+      toast.success(
+        `Welcome back! Signed in as ${data.email}`
+      );
+  
+    } catch (error: any) {
+  
+      console.log(error);
+  
+      toast.error(error.message);
+    }
   };
 
   const handleSocialLogin = async (provider: string) => {
