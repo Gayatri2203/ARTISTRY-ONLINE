@@ -48,7 +48,7 @@ function LoginFormInner() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-<<<<<<< HEAD
+
   
       await signInWithEmailAndPassword(
         auth,
@@ -64,14 +64,8 @@ function LoginFormInner() {
   
       console.log(error);
   
-      toast.error(error.message);
-=======
-      await login({ email: data.email, password: data.password });
-      toast.success(`Welcome back! Signed in as ${data.email}`);
-      router.push(redirect);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Login failed");
->>>>>>> origin/new
+      toast.error( error.message || "Login failed");
+
     }
   };
 
