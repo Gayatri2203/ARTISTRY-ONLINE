@@ -56,7 +56,7 @@ export default function SignupForm() {
   });
 
   const onSubmit = async (data: SignupFormValues) => {
-<<<<<<< HEAD
+
     try {
   
       const userCredential =
@@ -82,25 +82,13 @@ export default function SignupForm() {
       toast.success(
         `Account created. Welcome, ${data.name.split(" ")[0]}!`
       );
-  
+      router.push(ROUTES.dashboard);
     } catch (error: any) {
   
       console.log(error);
   
-      toast.error(error.message);
-=======
-    const username = data.name.trim().replace(/\s+/g, "_").toLowerCase();
-    try {
-      await registerUser({
-        username,
-        email: data.email,
-        password: data.password,
-      });
-      toast.success(`Account created. Welcome, ${data.name.split(" ")[0]}!`);
-      router.push(ROUTES.dashboard);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Registration failed");
->>>>>>> origin/new
+      toast.error(error.message || "Registration failed");
+
     }
   };
 
