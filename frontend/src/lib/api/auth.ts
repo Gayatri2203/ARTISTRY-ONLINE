@@ -1,101 +1,44 @@
-import { mockAuth, mockUsers } from "@/src/lib/mock/database";
 import type { AuthResponse, LoginCredentials, RegisterPayload, User } from "@/src/types";
 
-// Mock delay to simulate API calls
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
+
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    credentials: 'include',
+    ...options,
+  });
+
+  if (!res.ok) {
+    let message = res.statusText;
+    try { message = await res.text(); } catch {}
+    throw new Error(message || `Request failed: ${res.status}`);
+  }
+
+  const text = await res.text();
+  return text ? JSON.parse(text) : (undefined as unknown as T);
+}
 
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    await delay(500); // Simulate network delay
-    
-    const user = mockAuth.validateCredentials(credentials.email, credentials.password);
-    
-    if (!user) {
-      throw new Error("Invalid email or password");
-    }
-
-    const token = mockAuth.generateToken();
-    
-    return {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        avatar: user.avatar,
-        bio: user.bio,
-        isArtist: user.isArtist,
-        isVerified: user.isVerified,
-      },
-      token,
-    };
+    return request<AuthResponse>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
   },
 
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
-    await delay(500); // Simulate network delay
-    
-    // Check if user already exists
-    const existingUser = mockAuth.findByEmail(payload.email);
-    if (existingUser) {
-      throw new Error("User already exists");
-    }
-
-    // Create new user (in a real app, this would save to database)
-    const firstName = payload.firstName || payload.username;
-    const lastName = payload.lastName || "";
-    const newUser = {
-      id: `${Date.now()}`,
-      username: payload.username,
-      email: payload.email,
-      password: payload.password,
-      firstName,
-      lastName,
-      avatar: firstName.charAt(0) + (lastName.charAt(0) || ""),
-      bio: "",
-      isArtist: false,
-      isVerified: false,
-      createdAt: new Date().toISOString(),
-    };
-
-    const token = mockAuth.generateToken();
-    
-    return {
-      user: {
-        id: newUser.id,
-        username: newUser.username,
-        email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        avatar: newUser.avatar,
-        bio: newUser.bio,
-        isArtist: newUser.isArtist,
-        isVerified: newUser.isVerified,
-      },
-      token,
-    };
+    return request<AuthResponse>("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
   },
 
   me: async (): Promise<User> => {
-    await delay(300); // Simulate network delay
-    
-    // Return a mock user for testing
-    const mockUser = mockUsers[0];
-    return {
-      id: mockUser.id,
-      username: mockUser.username,
-      email: mockUser.email,
-      firstName: mockUser.firstName,
-      lastName: mockUser.lastName,
-      avatar: mockUser.avatar,
-      bio: mockUser.bio,
-      isArtist: mockUser.isArtist,
-      isVerified: mockUser.isVerified,
-    };
+    return request<User>("/api/auth/me", { method: "GET" });
   },
 
   logout: async (): Promise<void> => {
-    await delay(300); // Simulate network delay
-    return Promise.resolve();
+    await request<void>("/api/auth/logout", { method: "POST" });
   },
 };
