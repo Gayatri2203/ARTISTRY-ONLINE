@@ -22,17 +22,57 @@ export function ProtectedRoute({
 
   useEffect(() => {
 
-    if (!loading && !user) {
 
-      router.replace(
-        `/login?redirect=${encodeURIComponent(pathname)}`
-      );
+if (isHydrated && !loading && !user) {
+  const safePath =
+    typeof pathname === "string" && pathname
+      ? pathname
+      : "/";
 
-    }
+  const redirectUrl = `/login?redirect=${encodeURIComponent(
+    safePath
+  )}`;
 
-  }, [loading, user, router, pathname]);
+  try {
+    router.replace(redirectUrl);
+  } catch (e) {
+    router.replace("/login");
+  }
+}
+}, [isHydrated, loading, user, router, pathname]);
 
-  if (loading) {
+// Prevent hydration mismatch
+if (!isHydrated || loading) {
+return (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "60vh",
+    }}
+  >
+    <CircularProgress color="primary" />
+  </Box>
+);
+}
+
+// If user not authenticated, show loader while redirecting
+if (!user) {
+return (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "60vh",
+    }}
+  >
+    <CircularProgress color="primary" />
+  </Box>
+);
+
+    // While redirecting, show a loader to avoid flashing protected content
 
     return (
       <Box

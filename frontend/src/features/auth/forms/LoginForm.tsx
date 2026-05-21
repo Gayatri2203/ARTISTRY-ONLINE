@@ -33,8 +33,14 @@ import { loginSchema, type LoginFormValues } from "../schemas";
 function LoginFormInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+<<<<<<< HEAD
   const redirect = searchParams.get("redirect") ?? ROUTES.dashboard;
   const { user, loading: authLoading } = useAuth();
+=======
+  const rawRedirect = searchParams.get("redirect") ?? "";
+  const redirect = rawRedirect && rawRedirect.startsWith("/") ? rawRedirect : ROUTES.dashboard;
+  const { login, isLoading: authLoading } = useAuthStore();
+>>>>>>> origin/new
   const [socialLoading, setSocialLoading] = useState(false);
 
   const {
