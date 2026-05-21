@@ -13,11 +13,29 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isHydrated && !isAuthenticated) {
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
+      const safePath = typeof pathname === "string" && pathname ? pathname : "/";
+      const redirectUrl = `/login?redirect=${encodeURIComponent(safePath)}`;
+      try {
+        router.replace(redirectUrl);
+      } catch (e) {
+        // If replace fails for any reason, navigate to login without redirect
+        try {
+          router.replace("/login");
+        } catch {}
+      }
     }
   }, [isHydrated, isAuthenticated, router, pathname]);
 
-  if (!isHydrated || !isAuthenticated) {
+  if (!isHydrated) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
+
+  if (!isAuthenticated) {
+    // While redirecting, show a loader to avoid flashing protected content
     return (
       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
         <CircularProgress color="primary" />
