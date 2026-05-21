@@ -31,13 +31,13 @@ import { SocialLoginButtons } from "../components/SocialLoginButtons";
 import SubmitButton from "../components/SubmitButton";
 import { zodResolver } from "../lib/zodResolver";
 import { ROUTES } from "@/src/lib/constants";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuth } from "@/src/context/AuthContext";
 
 import { signupSchema, type SignupFormValues } from "../schemas";
 
 export default function SignupForm() {
   const router = useRouter();
-  const { register: registerUser, isLoading: authLoading } = useAuthStore();
+  const { register: registerUser, isLoading: authLoading } = useAuth();
   const [socialLoading, setSocialLoading] = useState(false);
 
   const {

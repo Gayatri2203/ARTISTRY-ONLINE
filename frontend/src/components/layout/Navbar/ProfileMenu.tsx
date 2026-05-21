@@ -12,12 +12,12 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuth } from "@/src/context/AuthContext";
 import { ROUTES } from "@/src/lib/constants";
 
 export function ProfileMenu() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 

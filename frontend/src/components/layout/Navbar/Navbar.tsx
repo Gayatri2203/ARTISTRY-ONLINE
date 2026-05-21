@@ -14,12 +14,12 @@ import { ProfileMenu } from "@/src/components/layout/Navbar/ProfileMenu";
 import Logo from "@/src/components/layout/Logo";
 import { NAV_LINKS } from "@/src/features/landing/data";
 import { useMobileNav } from "@/src/hooks/useMobileNav";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuth } from "@/src/context/AuthContext";
 import { touchIconButton } from "@/src/theme/responsive";
 
 export default function Navbar() {
   const { isOpen, open, close } = useMobileNav();
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuth();
 
   return (
     <>

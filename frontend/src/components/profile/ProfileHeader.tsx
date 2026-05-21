@@ -13,14 +13,14 @@ import Link from "next/link";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
 import { ROUTES } from "@/src/lib/constants";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuth } from "@/src/context/AuthContext";
 
 interface ProfileHeaderProps {
   username: string;
 }
 
 export function ProfileHeader({ username }: ProfileHeaderProps) {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user } = useAuth();
   const isOwnProfile = isAuthenticated && user?.username === username;
   return (
     <Box sx={{ position: "relative", mb: 4 }}>

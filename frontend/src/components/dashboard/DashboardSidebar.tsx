@@ -26,17 +26,17 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuth } from "@/src/context/AuthContext";
 import { ROUTES } from "@/src/lib/constants";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
     { icon: <DashboardIcon />, label: "Overview", href: "/dashboard" },
-    { icon: <PaletteIcon />, label: "My Artworks", href: user ? ROUTES.profile(user.username) : "/login" },
+    { icon: <PaletteIcon />, label: "My Artworks", href: "/profile"},
     { icon: <FavoriteIcon />, label: "Wishlist", href: "/dashboard/wishlist" },
     { icon: <ShoppingBagIcon />, label: "Orders", href: "/dashboard/orders" },
     { icon: <ShoppingCartIcon />, label: "Cart", href: "/dashboard/cart" },
@@ -128,17 +128,17 @@ export function DashboardSidebar() {
                 fontWeight: 600,
               }}
             >
-              JD
+             {user?.email?.charAt(0).toUpperCase()}
             </Avatar>
             <Box sx={{ flex: 1 }}>
               <Typography
                 variant="subtitle2"
                 sx={{ fontWeight: 600, color: "text.primary" }}
               >
-                John Doe
+                {user?.displayName || user?.email}
               </Typography>
               <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                Artist
+              Authenticated User
               </Typography>
             </Box>
           </Box>

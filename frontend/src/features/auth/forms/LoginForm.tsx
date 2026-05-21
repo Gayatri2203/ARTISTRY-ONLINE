@@ -24,8 +24,9 @@ import PasswordField from "../components/PasswordField";
 import { SocialLoginButtons } from "../components/SocialLoginButtons";
 import SubmitButton from "../components/SubmitButton";
 import { zodResolver } from "../lib/zodResolver";
-import { useAuthStore } from "@/src/store/authStore";
+import { useAuth } from "@/src/context/AuthContext";
 import { ROUTES } from "@/src/lib/constants";
+
 
 import { loginSchema, type LoginFormValues } from "../schemas";
 
@@ -33,7 +34,7 @@ function LoginFormInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") ?? ROUTES.dashboard;
-  const { login, isLoading: authLoading } = useAuthStore();
+  const { user, loading: authLoading } = useAuth();
   const [socialLoading, setSocialLoading] = useState(false);
 
   const {
@@ -59,6 +60,7 @@ function LoginFormInner() {
       toast.success(
         `Welcome back! Signed in as ${data.email}`
       );
+      router.push("/dashboard");
   
     } catch (error: any) {
   

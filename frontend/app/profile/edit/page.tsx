@@ -12,44 +12,59 @@ import toast from "react-hot-toast";
 import { ProtectedRoute } from "@/src/components/auth/ProtectedRoute";
 import { AppShell } from "@/src/components/layout/AppShell";
 import { GlassCard } from "@/src/components/ui/GlassCard";
-import { usersApi } from "@/src/lib/api/users";
-import { ROUTES } from "@/src/lib/constants";
-import { useAuthStore } from "@/src/store/authStore";
+
+import { useAuth } from "@/src/context/AuthContext";
 
 function EditProfileContent() {
   const router = useRouter();
-  const { user, setUser } = useAuthStore();
+  const { user } = useAuth();
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      setUsername(user.username);
-      setBio(user.bio ?? "");
-      setWebsite(user.socialLinks?.website ?? "");
-    }
-  }, [user]);
+ 
+    useEffect(() => {
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const updated = await usersApi.updateProfile({
-        username,
-        bio,
-        socialLinks: { website },
-      });
-      setUser(updated);
-      toast.success("Profile updated");
-      router.push(ROUTES.profile(updated.username));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Update failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (user) {
+    
+        setUsername(
+          user.displayName || ""
+        );
+    
+      }
+    
+    }, [user]);
+ 
+
+    const handleSubmit = async (
+      e: React.FormEvent
+    ) => {
+    
+      e.preventDefault();
+    
+      setLoading(true);
+    
+      try {
+    
+        toast.success(
+          "Profile editing will be connected to Firestore soon"
+        );
+    
+        router.push("/dashboard");
+    
+      } catch (e) {
+    
+        toast.error(
+          "Update failed"
+        );
+    
+      } finally {
+    
+        setLoading(false);
+    
+      }
+    };
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
