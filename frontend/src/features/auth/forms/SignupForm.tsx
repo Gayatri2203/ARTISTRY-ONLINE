@@ -37,7 +37,7 @@ import { signupSchema, type SignupFormValues } from "../schemas";
 
 export default function SignupForm() {
   const router = useRouter();
-  const { register: registerUser, isLoading: authLoading } = useAuth();
+  const { loading: authLoading } = useAuth();
   const [socialLoading, setSocialLoading] = useState(false);
 
   const {

@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import {
@@ -44,6 +44,12 @@ function LoginFormInner() {
   const { user, loading: authLoading } = useAuth();
   const [socialLoading, setSocialLoading] = useState(false);
 
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace(redirect);
+    }
+  }, [authLoading, user, router, redirect]);
+
   const {
     control,
     handleSubmit,
@@ -67,7 +73,7 @@ function LoginFormInner() {
       toast.success(
         `Welcome back! Signed in as ${data.email}`
       );
-      router.push("/dashboard");
+      router.push(redirect);
   
     } catch (error: any) {
   

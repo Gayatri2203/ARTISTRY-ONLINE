@@ -27,22 +27,23 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
 import { useAuth } from "@/src/context/AuthContext";
+import { useUserData } from "@/src/hooks/useUserData";
 import { ROUTES } from "@/src/lib/constants";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { userData } = useUserData();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
     { icon: <DashboardIcon />, label: "Overview", href: "/dashboard" },
     { icon: <PaletteIcon />, label: "My Artworks", href: "/profile"},
-    { icon: <FavoriteIcon />, label: "Wishlist", href: "/dashboard/wishlist" },
-    { icon: <ShoppingBagIcon />, label: "Orders", href: "/dashboard/orders" },
-    { icon: <ShoppingCartIcon />, label: "Cart", href: "/dashboard/cart" },
-    { icon: <AnalyticsIcon />, label: "Analytics", href: "/dashboard/analytics" },
-    { icon: <UploadIcon />, label: "Upload Artwork", href: "/upload" },
-    { icon: <SettingsIcon />, label: "Settings", href: "/dashboard/settings" },
+    { icon: <FavoriteIcon />, label: "Wishlist", href: "/wishlist" },
+    { icon: <ShoppingBagIcon />, label: "Orders", href: "/orders" },
+    { icon: <ShoppingCartIcon />, label: "Cart", href: "/cart" },
+    { icon: <UploadIcon />, label: "Upload Artwork", href: ROUTES.upload },
+    { icon: <SettingsIcon />, label: "Settings", href: ROUTES.profileEdit },
   ];
 
   return (
@@ -135,10 +136,10 @@ export function DashboardSidebar() {
                 variant="subtitle2"
                 sx={{ fontWeight: 600, color: "text.primary" }}
               >
-                {user?.displayName || user?.email}
+                {userData?.name || user?.email}
               </Typography>
               <Typography variant="caption" sx={{ color: "text.secondary" }}>
-              Authenticated User
+              {userData?.email}
               </Typography>
             </Box>
           </Box>

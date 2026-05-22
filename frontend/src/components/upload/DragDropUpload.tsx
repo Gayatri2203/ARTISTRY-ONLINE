@@ -6,6 +6,13 @@ import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+
+import { storage } from "@/src/lib/firebase";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
 import { useUploadContext } from "@/src/features/upload/UploadContext";
@@ -40,10 +47,39 @@ export function DragDropUpload() {
     setFiles(files);
   }, [setImageFile]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+  
     const files = Array.from(e.target.files || []);
+  
     setFiles(files);
+  
+    if (!files[0]) return;
+  
+    try {
+  
+      const image = files[0];
+  
+      const storageRef = ref(
+        storage,
+        `artworks/${Date.now()}-${image.name}`
+      );
+  
+      await uploadBytes(storageRef, image);
+  
+      const downloadURL = await getDownloadURL(storageRef);
+  
+      console.log("Uploaded Image URL:", downloadURL);
+  
+    } catch (error) {
+  
+      console.log(error);
+  
+    }
   };
+
+ 
 
   return (
     <GlassCard sx={{ p: 3, mb: 3 }}>

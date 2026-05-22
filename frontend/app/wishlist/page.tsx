@@ -1,5 +1,6 @@
 "use client";
 
+import { ProtectedRoute } from "@/src/components/auth/ProtectedRoute";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -18,6 +19,7 @@ export default function WishlistPage() {
   ];
 
   return (
+    <ProtectedRoute>
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <motion.div
         variants={staggerContainer}
@@ -76,5 +78,6 @@ export default function WishlistPage() {
         </Box>
       </motion.div>
     </Container>
+    </ProtectedRoute>
   );
 }

@@ -7,6 +7,11 @@ import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
+
+import { useRouter } from "next/navigation";
+
+import { useAuth } from "@/src/context/AuthContext";
 
 import { ProtectedRoute } from "@/src/components/auth/ProtectedRoute";
 import { AppShell } from "@/src/components/layout/AppShell";

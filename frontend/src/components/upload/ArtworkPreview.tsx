@@ -1,14 +1,14 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardMedia from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
-import { motion } from "framer-motion";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
+import { useUploadContext } from "@/src/features/upload/UploadContext";
 
 export function ArtworkPreview() {
+  const { imageFile, artworkData } = useUploadContext();
+
   return (
     <GlassCard sx={{ p: 3 }}>
       <Typography
@@ -22,7 +22,9 @@ export function ArtworkPreview() {
         sx={{
           aspectRatio: 1,
           borderRadius: "16px",
-          background: "linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)",
+          overflow: "hidden",
+          background:
+            "linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)",
           border: "2px dashed rgba(255, 255, 255, 0.2)",
           display: "flex",
           alignItems: "center",
@@ -30,9 +32,21 @@ export function ArtworkPreview() {
           mb: 3,
         }}
       >
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          Artwork preview will appear here
-        </Typography>
+        {imageFile ? (
+          <img
+            src={URL.createObjectURL(imageFile)}
+            alt="Artwork Preview"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            Artwork preview will appear here
+          </Typography>
+        )}
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -43,11 +57,12 @@ export function ArtworkPreview() {
           >
             Title
           </Typography>
+
           <Typography
             variant="body1"
             sx={{ color: "text.primary", fontWeight: 500 }}
           >
-            Your Artwork Title
+            {artworkData?.title || "Your Artwork Title"}
           </Typography>
         </Box>
 
@@ -58,11 +73,12 @@ export function ArtworkPreview() {
           >
             Category
           </Typography>
+
           <Typography
             variant="body2"
             sx={{ color: "text.secondary" }}
           >
-            Digital Art
+            {artworkData?.category || "Digital Art"}
           </Typography>
         </Box>
 
@@ -73,6 +89,7 @@ export function ArtworkPreview() {
           >
             Price
           </Typography>
+
           <Typography
             variant="h6"
             sx={{
@@ -80,7 +97,7 @@ export function ArtworkPreview() {
               fontWeight: 700,
             }}
           >
-            $0.00
+            ${artworkData?.price || "0.00"}
           </Typography>
         </Box>
       </Box>

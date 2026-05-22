@@ -21,7 +21,8 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ username }: ProfileHeaderProps) {
   const { user } = useAuth();
-  const isOwnProfile = isAuthenticated && user?.username === username;
+  const isOwnProfile = Boolean(user);
+  
   return (
     <Box sx={{ position: "relative", mb: 4 }}>
       {/* Cover Banner */}
@@ -95,7 +96,10 @@ export function ProfileHeader({ username }: ProfileHeaderProps) {
                   fontSize: { xs: 48, md: 64 },
                 }}
               >
-                {username.charAt(0).toUpperCase()}
+                {(user?.displayName?.charAt(0) ||
+  user?.email?.charAt(0) ||
+  "U").toUpperCase()}
+
               </Avatar>
               <Button
                 component={motion.button}
@@ -129,23 +133,24 @@ export function ProfileHeader({ username }: ProfileHeaderProps) {
               textAlign: { xs: "center", md: "left" },
             }}
           >
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 700,
-                background: "linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              {username}
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ color: "text.secondary", fontWeight: 500 }}
-            >
-              Digital Artist & Collector
-            </Typography>
+<Typography
+  variant="h3"
+  sx={{
+    fontWeight: 700,
+    background: "linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+  }}
+>
+  {user?.displayName || user?.email?.split("@")[0] || "User"}
+</Typography>
+
+<Typography
+  variant="body1"
+  sx={{ color: "text.secondary", fontWeight: 500 }}
+>
+  {user?.email}
+</Typography>
             <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
               {isOwnProfile && (
               <Button

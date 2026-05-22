@@ -20,6 +20,7 @@ import { touchIconButton } from "@/src/theme/responsive";
 export default function Navbar() {
   const { isOpen, open, close } = useMobileNav();
   const { user } = useAuth();
+  const isAuthenticated = Boolean(user);
 
   return (
     <>
