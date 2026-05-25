@@ -4,6 +4,7 @@ export type ArtworkItem = {
   artist: string;
   price: string;
   tag: string;
-  gradient: string;
+  imageUrl?: string;
+  gradient?: string;
   likes?: number;
 };

@@ -18,6 +18,15 @@ export type ArtistInfoProps = {
   artistName?: string;
 };
 
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 export function ArtistInfo({
   artistUsername = "johndoe",
   artistName = "John Doe",
@@ -43,7 +52,7 @@ export function ArtistInfo({
               borderColor: "primary.main",
             }}
           >
-            JD
+            {getInitials(artistName)}
           </Avatar>
         </motion.div>
 

@@ -8,7 +8,23 @@ import { motion } from "framer-motion";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
 
-export function ArtworkDetails() {
+export type ArtworkDetailsProps = {
+  title: string;
+  description: string;
+  category: string;
+  createdAtLabel: string;
+  priceLabel: string;
+};
+
+export function ArtworkDetails({
+  title,
+  description,
+  category,
+  createdAtLabel,
+  priceLabel,
+}: ArtworkDetailsProps) {
+  const tags = category ? [category] : [];
+
   return (
     <GlassCard sx={{ p: 3, mb: 3 }}>
       <Typography
@@ -21,7 +37,7 @@ export function ArtworkDetails() {
           WebkitTextFillColor: "transparent",
         }}
       >
-        Ethereal Dreams
+        {title}
       </Typography>
 
       <Box sx={{ mb: 3 }}>
@@ -38,9 +54,7 @@ export function ArtworkDetails() {
             lineHeight: 1.7,
           }}
         >
-          A mesmerizing exploration of color and form, this piece captures the essence of dreams 
-          through vibrant gradients and abstract compositions. Created using digital techniques 
-          that blend traditional artistry with modern technology.
+          {description || "No description provided."}
         </Typography>
       </Box>
 
@@ -57,7 +71,7 @@ export function ArtworkDetails() {
               Category
             </Typography>
             <Typography variant="body2" sx={{ color: "text.primary", fontWeight: 500 }}>
-              Digital Art
+              {category || "—"}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -65,57 +79,51 @@ export function ArtworkDetails() {
               Created
             </Typography>
             <Typography variant="body2" sx={{ color: "text.primary", fontWeight: 500 }}>
-              January 2024
+              {createdAtLabel}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              Dimensions
+              Price
             </Typography>
             <Typography variant="body2" sx={{ color: "text.primary", fontWeight: 500 }}>
-              4000 x 3000 px
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              License
-            </Typography>
-            <Typography variant="body2" sx={{ color: "text.primary", fontWeight: 500 }}>
-              Commercial Use
+              {priceLabel}
             </Typography>
           </Box>
         </Stack>
       </Box>
 
-      <Box>
-        <Typography
-          variant="subtitle2"
-          sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}
-        >
-          Tags
-        </Typography>
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-          {["Abstract", "Digital", "Colorful", "Modern", "Gradient"].map((tag) => (
-            <motion.div
-              key={tag}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Chip
-                label={tag}
-                size="small"
-                sx={{
-                  background: "rgba(99, 102, 241, 0.15)",
-                  border: "1px solid rgba(99, 102, 241, 0.3)",
-                  color: "primary.light",
-                  fontWeight: 500,
-                  borderRadius: "6px",
-                }}
-              />
-            </motion.div>
-          ))}
+      {tags.length > 0 && (
+        <Box>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}
+          >
+            Tags
+          </Typography>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {tags.map((tag) => (
+              <motion.div
+                key={tag}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Chip
+                  label={tag}
+                  size="small"
+                  sx={{
+                    background: "rgba(99, 102, 241, 0.15)",
+                    border: "1px solid rgba(99, 102, 241, 0.3)",
+                    color: "primary.light",
+                    fontWeight: 500,
+                    borderRadius: "6px",
+                  }}
+                />
+              </motion.div>
+            ))}
+          </Box>
         </Box>
-      </Box>
+      )}
     </GlassCard>
   );
 }

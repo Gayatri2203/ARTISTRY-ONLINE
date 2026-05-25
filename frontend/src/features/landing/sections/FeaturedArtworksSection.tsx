@@ -5,19 +5,30 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Link from "next/link";
 
+import { ArtworksLoadState } from "@/src/components/home/ArtworksLoadState";
 import {
   AnimatedInView,
   SectionShell,
   StaggerReveal,
   StaggerRevealItem,
 } from "@/src/components/ui";
+import { useFirestoreArtworks } from "@/src/hooks/useFirestoreArtworks";
 import { fadeInUp } from "@/src/lib/motion";
 import { sectionGridSpacing } from "@/src/theme/responsive";
 
 import { ArtworkCard, SectionHeader } from "../components";
-import { FEATURED_ARTWORKS } from "../data";
 
 export default function FeaturedArtworksSection() {
+  const { featuredArtworks, loading, error } = useFirestoreArtworks();
+
+  const loadState = (
+    <ArtworksLoadState
+      loading={loading}
+      error={error}
+      isEmpty={!loading && !error && featuredArtworks.length === 0}
+    />
+  );
+
   return (
     <SectionShell id="explore">
       <Stack
@@ -53,17 +64,21 @@ export default function FeaturedArtworksSection() {
         </AnimatedInView>
       </Stack>
 
-      <StaggerReveal>
-        <Grid container spacing={sectionGridSpacing}>
-          {FEATURED_ARTWORKS.map((artwork) => (
-            <Grid key={artwork.id} size={{ xs: 12, sm: 6, md: 4 }}>
-              <StaggerRevealItem sx={{ height: "100%" }}>
-                <ArtworkCard {...artwork} />
-              </StaggerRevealItem>
-            </Grid>
-          ))}
-        </Grid>
-      </StaggerReveal>
+      {loadState}
+
+      {!loading && !error && featuredArtworks.length > 0 && (
+        <StaggerReveal>
+          <Grid container spacing={sectionGridSpacing}>
+            {featuredArtworks.map((artwork) => (
+              <Grid key={artwork.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                <StaggerRevealItem sx={{ height: "100%" }}>
+                  <ArtworkCard {...artwork} />
+                </StaggerRevealItem>
+              </Grid>
+            ))}
+          </Grid>
+        </StaggerReveal>
+      )}
     </SectionShell>
   );
 }

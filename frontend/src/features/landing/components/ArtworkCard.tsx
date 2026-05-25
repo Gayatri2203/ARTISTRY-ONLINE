@@ -9,6 +9,8 @@ import { memo } from "react";
 
 import { GlassCard, LikeBadge, tapLinkStyle } from "@/src/components/ui";
 
+import { getArtworkMediaSx } from "@/src/components/home/artworkMedia";
+
 import type { ArtworkItem } from "../types";
 
 function ArtworkCardComponent({
@@ -18,15 +20,17 @@ function ArtworkCardComponent({
   price,
   tag,
   gradient,
+  imageUrl,
   likes = 0,
 }: ArtworkItem) {
   return (
     <Link href={id ? `/artwork/${id}` : "/explore"} style={tapLinkStyle}>
       <GlassCard sx={{ overflow: "hidden", height: "100%" }}>
         <Box
-          sx={{
+          sx={getArtworkMediaSx(
+            { imageUrl, gradient },
+            {
             height: { xs: 200, sm: 220, md: 240 },
-            background: gradient,
             position: "relative",
             overflow: "hidden",
             "@media (hover: hover)": {
@@ -41,7 +45,8 @@ function ArtworkCardComponent({
               },
               ".MuiCard-root:hover &::after": { opacity: 1 },
             },
-          }}
+            }
+          )}
         >
           <Chip
             label={tag}

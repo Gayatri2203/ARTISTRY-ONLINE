@@ -5,28 +5,52 @@ import Typography from "@mui/material/Typography";
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from "firebase/storage";
-
-import { storage } from "@/src/lib/firebase";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
 import { useUploadContext } from "@/src/features/upload/UploadContext";
+import { uploadImageToCloudinary } from "@/src/features/upload/uploadImageToCloudinary";
 
 export function DragDropUpload() {
-  const { setImageFile } = useUploadContext();
+  const { setImageFile, setImageUrl } = useUploadContext();
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const setFiles = (files: File[]) => {
     const imageFiles = files.filter((f) => f.type.startsWith("image/"));
     setUploadedFiles(imageFiles);
     setImageFile(imageFiles[0] ?? null);
+    setImageUrl(null);
   };
+
+  const uploadSelectedImage = useCallback(async (file: File) => {
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const imageUrl = await uploadImageToCloudinary(file);
+      setImageUrl(imageUrl);
+      console.log("Cloudinary imageUrl:", imageUrl);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Image upload failed";
+      setUploadError(message);
+      console.error("Cloudinary upload error:", error);
+    } finally {
+      setIsUploading(false);
+    }
+  }, []);
+
+  const handleImageSelection = useCallback(
+    async (files: File[]) => {
+      setFiles(files);
+      const image = files.find((f) => f.type.startsWith("image/"));
+      if (!image) return;
+      await uploadSelectedImage(image);
+    },
+    [uploadSelectedImage]
+  );
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -38,48 +62,23 @@ export function DragDropUpload() {
     }
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
 
-    const files = Array.from(e.dataTransfer.files);
-    setFiles(files);
-  }, [setImageFile]);
+      const files = Array.from(e.dataTransfer.files);
+      void handleImageSelection(files);
+    },
+    [handleImageSelection]
+  );
 
-  const handleFileSelect = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-  
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-  
-    setFiles(files);
-  
-    if (!files[0]) return;
-  
-    try {
-  
-      const image = files[0];
-  
-      const storageRef = ref(
-        storage,
-        `artworks/${Date.now()}-${image.name}`
-      );
-  
-      await uploadBytes(storageRef, image);
-  
-      const downloadURL = await getDownloadURL(storageRef);
-  
-      console.log("Uploaded Image URL:", downloadURL);
-  
-    } catch (error) {
-  
-      console.log(error);
-  
-    }
+    void handleImageSelection(files);
+    e.target.value = "";
   };
-
- 
 
   return (
     <GlassCard sx={{ p: 3, mb: 3 }}>
@@ -139,6 +138,21 @@ export function DragDropUpload() {
           </Typography>
         </motion.div>
       </Box>
+
+      {(isUploading || uploadError) && (
+        <Typography
+          variant="caption"
+          sx={{
+            display: "block",
+            mt: 1.5,
+            color: uploadError ? "error.main" : "text.secondary",
+          }}
+        >
+          {isUploading
+            ? "Uploading image to Cloudinary..."
+            : uploadError}
+        </Typography>
+      )}
 
       <input
         id="file-upload"

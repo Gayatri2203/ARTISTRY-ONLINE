@@ -16,6 +16,7 @@ import { ArtworkCategoryTags } from "./ArtworkCategoryTags";
 import { ArtworkHoverOverlay } from "./ArtworkHoverOverlay";
 import { ArtworkMetrics } from "./ArtworkMetrics";
 import type { ExploreArtwork } from "./types";
+import { getArtworkMediaSx } from "./artworkMedia";
 import { MASONRY_HEIGHTS } from "./utils";
 
 export type ExploreArtworkCardProps = {
@@ -49,14 +50,13 @@ function ExploreArtworkCardComponent({ artwork }: ExploreArtworkCardProps) {
           }}
         >
           <Box
-            sx={{
+            sx={getArtworkMediaSx(artwork, {
               position: "relative",
               height: {
                 xs: mediaHeight * 0.85,
                 sm: mediaHeight,
               },
-              background: artwork.gradient,
-            }}
+            })}
           >
             {artwork.featuredTag && (
               <Chip

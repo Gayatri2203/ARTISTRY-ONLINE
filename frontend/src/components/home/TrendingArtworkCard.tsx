@@ -16,6 +16,7 @@ import { ArtworkCategoryTags } from "./ArtworkCategoryTags";
 import { ArtworkHoverOverlay } from "./ArtworkHoverOverlay";
 import { ArtworkMetrics } from "./ArtworkMetrics";
 import { TrendingRankBadge } from "./TrendingRankBadge";
+import { getArtworkMediaSx } from "./artworkMedia";
 import type { TrendingArtwork } from "./types";
 
 export type TrendingArtworkCardProps = {
@@ -59,12 +60,11 @@ function TrendingArtworkCardComponent({
           }}
         >
           <Box
-            sx={{
+            sx={getArtworkMediaSx(artwork, {
               position: "relative",
               height: mediaHeight,
-              background: artwork.gradient,
               overflow: "hidden",
-            }}
+            })}
           >
             <TrendingRankBadge rank={artwork.rank} />
             {artwork.featuredTag && (

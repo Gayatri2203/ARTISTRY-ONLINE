@@ -15,7 +15,11 @@ import ShareIcon from "@mui/icons-material/Share";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
 
-export function ActionButtons() {
+export type ActionButtonsProps = {
+  priceLabel: string;
+};
+
+export function ActionButtons({ priceLabel }: ActionButtonsProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [likes, setLikes] = useState(234);
@@ -47,7 +51,7 @@ export function ActionButtons() {
             WebkitTextFillColor: "transparent",
           }}
         >
-          $1,250.00
+          {priceLabel}
         </Typography>
       </Box>
 

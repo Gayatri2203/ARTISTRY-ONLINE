@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 
-import { EXPLORE_ARTWORKS } from "../data";
 import type {
   ExploreArtwork,
   ExploreFiltersState,
@@ -22,7 +21,9 @@ function sortArtworks(
   const copy = [...items];
   switch (sort) {
     case "newest":
-      return copy.reverse();
+      return copy.sort(
+        (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)
+      );
     case "most-liked":
       return copy.sort((a, b) => b.likes - a.likes);
     case "most-viewed":
@@ -33,7 +34,10 @@ function sortArtworks(
   }
 }
 
-export function useExploreFilters(initial?: Partial<ExploreFiltersState>) {
+export function useExploreFilters(
+  sourceArtworks: ExploreArtwork[],
+  initial?: Partial<ExploreFiltersState>
+) {
   const [filters, setFilters] = useState<ExploreFiltersState>({
     ...DEFAULT_FILTERS,
     ...initial,
@@ -42,7 +46,7 @@ export function useExploreFilters(initial?: Partial<ExploreFiltersState>) {
   const filteredArtworks = useMemo(() => {
     const query = filters.query.trim().toLowerCase();
 
-    let results = EXPLORE_ARTWORKS.filter((artwork) => {
+    let results = sourceArtworks.filter((artwork) => {
       const matchesQuery =
         !query ||
         artwork.title.toLowerCase().includes(query) ||
@@ -58,7 +62,7 @@ export function useExploreFilters(initial?: Partial<ExploreFiltersState>) {
     });
 
     return sortArtworks(results, filters.sort);
-  }, [filters]);
+  }, [filters, sourceArtworks]);
 
   const setQuery = (query: string) => setFilters((prev) => ({ ...prev, query }));
   const setCategoryId = (categoryId: string | null) =>

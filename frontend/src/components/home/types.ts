@@ -13,11 +13,16 @@ export type ExploreArtwork = {
   artist: ArtistProfile;
   price: string;
   categories: string[];
-  gradient: string;
+  /** Cloudinary URL from Firestore */
+  imageUrl?: string;
+  /** Fallback when imageUrl is missing */
+  gradient?: string;
   likes: number;
   views: number;
   masonrySize: MasonrySize;
   featuredTag?: string;
+  /** Milliseconds since epoch — used for newest sort */
+  createdAt?: number;
 };
 
 export type TrendingArtwork = ExploreArtwork & {

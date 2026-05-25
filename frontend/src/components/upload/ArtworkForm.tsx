@@ -12,15 +12,18 @@ import SaveIcon from "@mui/icons-material/Save";
 import toast from "react-hot-toast";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
-import { artworksApi } from "@/src/lib/api/artworks";
 import { ROUTES } from "@/src/lib/constants";
+import { useAuth } from "@/src/context/AuthContext";
 import { useUploadContext } from "@/src/features/upload/UploadContext";
+import { saveArtworkToFirestore } from "@/src/features/upload/saveArtworkToFirestore";
+import { uploadImageToCloudinary } from "@/src/features/upload/uploadImageToCloudinary";
 import { CategorySelector } from "./CategorySelector";
 import { TagsInput } from "./TagsInput";
 
 export function ArtworkForm() {
   const router = useRouter();
-  const { imageFile } = useUploadContext();
+  const { user } = useAuth();
+  const { imageFile, imageUrl, setImageUrl } = useUploadContext();
   const [publishing, setPublishing] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -45,18 +48,37 @@ export function ArtworkForm() {
     }
     setPublishing(true);
     try {
-      const form = new FormData();
-      form.append("title", formData.title);
-      form.append("description", formData.description);
-      form.append("category", formData.category);
-      form.append("tags", formData.tags.join(","));
-      if (formData.price) form.append("price", formData.price);
-      form.append("image", imageFile);
-      const artwork = await artworksApi.upload(form);
-      toast.success("Artwork published!");
-      router.push(ROUTES.artwork(artwork.id));
+      let resolvedImageUrl = imageUrl;
+
+      if (!resolvedImageUrl) {
+        resolvedImageUrl = await uploadImageToCloudinary(imageFile);
+        setImageUrl(resolvedImageUrl);
+        console.log("Cloudinary imageUrl:", resolvedImageUrl);
+      }
+
+      const priceValue = formData.price.trim()
+        ? Number.parseFloat(formData.price)
+        : null;
+
+      if (priceValue !== null && Number.isNaN(priceValue)) {
+        throw new Error("Please enter a valid price");
+      }
+
+      const artworkId = await saveArtworkToFirestore({
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        category: formData.category,
+        price: priceValue,
+        imageUrl: resolvedImageUrl,
+        artistId: user?.uid,
+      });
+
+      console.log("Artwork saved to Firestore:", { artworkId, imageUrl: resolvedImageUrl });
+      toast.success("Artwork published to Firestore!");
+      router.push(ROUTES.artwork(artworkId));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
+      toast.error(e instanceof Error ? e.message : "Failed to save artwork");
+      console.error("Firestore artwork save error:", e);
     } finally {
       setPublishing(false);
     }
