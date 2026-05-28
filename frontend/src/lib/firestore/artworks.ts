@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -7,6 +8,7 @@ import {
   query,
   type DocumentData,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 
 import { ARTWORKS_COLLECTION } from "@/src/features/upload/saveArtworkToFirestore";
@@ -28,6 +30,13 @@ export type FirestoreArtwork = {
   imageUrl: string;
   artistId?: string;
   createdAt: number | null;
+};
+
+export type ArtworkUpdateInput = {
+  title: string;
+  description: string;
+  category: string;
+  price: number | null;
 };
 
 function parseCreatedAt(value: unknown): number | null {
@@ -177,6 +186,24 @@ export async function fetchArtworkById(
   }
 
   return parseFirestoreDoc(snapshot.id, snapshot.data());
+}
+
+/** Updates editable artwork fields for a document. */
+export async function updateArtworkById(
+  id: string,
+  input: ArtworkUpdateInput
+): Promise<void> {
+  await updateDoc(doc(db, ARTWORKS_COLLECTION, id), {
+    title: input.title,
+    description: input.description,
+    category: input.category,
+    price: input.price,
+  });
+}
+
+/** Deletes an artwork document by id. */
+export async function deleteArtworkById(id: string): Promise<void> {
+  await deleteDoc(doc(db, ARTWORKS_COLLECTION, id));
 }
 
 /** Fetches all artworks from Firestore, newest first. */

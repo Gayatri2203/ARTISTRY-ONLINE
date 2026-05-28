@@ -2,13 +2,18 @@
 
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { memo } from "react";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 import { MotionBox } from "@/src/components/ui";
 import { tapLinkStyle } from "@/src/components/ui/styles";
+import { useArtworkLikes } from "@/src/hooks/useArtworkLikes";
 import { staggerItem } from "@/src/lib/motion";
 
 import { ArtistMeta } from "./ArtistMeta";
@@ -25,6 +30,9 @@ export type ExploreArtworkCardProps = {
 
 function ExploreArtworkCardComponent({ artwork }: ExploreArtworkCardProps) {
   const mediaHeight = MASONRY_HEIGHTS[artwork.masonrySize];
+  const { likesCount, isLiked, toggling, canLike, toggleLike } = useArtworkLikes(
+    artwork.id
+  );
 
   return (
     <MotionBox variants={staggerItem} sx={{ breakInside: "avoid", mb: 2.5 }}>
@@ -86,11 +94,38 @@ function ExploreArtworkCardComponent({ artwork }: ExploreArtworkCardProps) {
               }}
             >
               <ArtworkMetrics
-                likes={artwork.likes}
+                likes={likesCount}
                 views={artwork.views}
                 compact
               />
             </Box>
+            <IconButton
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                void toggleLike();
+              }}
+              disabled={!canLike || toggling}
+              size="small"
+              sx={{
+                position: "absolute",
+                bottom: 12,
+                right: 12,
+                zIndex: 2,
+                bgcolor: "rgba(0,0,0,0.4)",
+                backdropFilter: "blur(8px)",
+                color: isLiked ? "#f43f5e" : "white",
+                "&:hover": { bgcolor: "rgba(0,0,0,0.6)" },
+              }}
+            >
+              {toggling ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : isLiked ? (
+                <FavoriteIcon fontSize="small" />
+              ) : (
+                <FavoriteBorderIcon fontSize="small" />
+              )}
+            </IconButton>
             <ArtworkHoverOverlay title={artwork.title} price={artwork.price} />
           </Box>
 

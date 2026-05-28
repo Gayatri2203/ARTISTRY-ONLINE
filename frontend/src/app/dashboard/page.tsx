@@ -1,15 +1,11 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect } from "react";
-
-import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/src/context/AuthContext";
 
@@ -29,6 +25,8 @@ import { fadeInUp, staggerContainer } from "@/src/lib/motion";
 
 function DashboardPageContent() {
   const [activeTab, setActiveTab] = useState(0);
+  const { user } = useAuth();
+  const userId = user?.uid;
 
   const renderContent = () => {
     switch (activeTab) {
@@ -36,7 +34,7 @@ function DashboardPageContent() {
         return (
           <>
             <motion.div variants={fadeInUp}>
-              <StatsCards />
+              <StatsCards userId={userId} />
             </motion.div>
 
             <Box
@@ -67,7 +65,7 @@ function DashboardPageContent() {
                 </motion.div>
 
                 <motion.div variants={fadeInUp}>
-                  <SavedArtworks />
+                  <SavedArtworks userId={userId} />
                 </motion.div>
               </Box>
             </Box>

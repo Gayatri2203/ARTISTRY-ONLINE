@@ -2,6 +2,7 @@
 
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -14,45 +15,69 @@ import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SendIcon from "@mui/icons-material/Send";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
+  Timestamp,
+  where,
+  type DocumentData,
+} from "firebase/firestore";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
+import { useAuth } from "@/src/context/AuthContext";
+import { db } from "@/src/lib/firebase";
 
-export type Comment = {
-  id: number;
-  user: string;
-  avatar: string;
+type FirestoreComment = {
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatar: string | null;
   text: string;
-  /** Display label — use fixed strings or client-formatted relative time */
-  time: string;
-  likes: number;
-  isLiked: boolean;
+  createdAt: number | null;
 };
 
-const INITIAL_COMMENTS: Comment[] = [
-  {
-    id: 1,
-    user: "alex_art",
-    avatar: "AA",
-    text: "Absolutely stunning piece! The color palette is mesmerizing.",
-    time: "2 hours ago",
-    likes: 24,
-    isLiked: false,
-  },
-  {
-    id: 2,
-    user: "sarah_creates",
-    avatar: "SC",
-    text: "Love the abstract composition. Would love to see more work like this!",
-    time: "5 hours ago",
-    likes: 18,
-    isLiked: false,
-  },
-];
+const COMMENTS_COLLECTION = "comments" as const;
+
+function parseCreatedAt(value: unknown): number | null {
+  if (value instanceof Timestamp) {
+    return value.toMillis();
+  }
+  if (
+    value &&
+    typeof value === "object" &&
+    "seconds" in value &&
+    typeof (value as { seconds: number }).seconds === "number"
+  ) {
+    return (value as { seconds: number }).seconds * 1000;
+  }
+  return null;
+}
+
+function parseCommentDoc(id: string, data: DocumentData): FirestoreComment | null {
+  if (
+    typeof data.userId !== "string" ||
+    typeof data.userName !== "string" ||
+    typeof data.text !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    id,
+    userId: data.userId,
+    userName: data.userName,
+    userAvatar: typeof data.userAvatar === "string" ? data.userAvatar : null,
+    text: data.text,
+    createdAt: parseCreatedAt(data.createdAt),
+  };
+}
 
 /** Client-only relative time — call after mount to avoid hydration mismatch. */
-export function formatCommentTimeAgo(createdAtMs: number): string {
+function formatCommentTimeAgo(createdAtMs: number): string {
   const seconds = Math.floor((Date.now() - createdAtMs) / 1000);
   if (seconds < 60) return "Just now";
   const minutes = Math.floor(seconds / 60);
@@ -63,14 +88,27 @@ export function formatCommentTimeAgo(createdAtMs: number): string {
   return `${days} day${days === 1 ? "" : "s"} ago`;
 }
 
+function getAvatarLabel(comment: FirestoreComment): string {
+  if (comment.userAvatar) return "";
+  return comment.userName
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 type CommentListProps = {
-  comments: Comment[];
-  onLike: (id: number) => void;
+  comments: FirestoreComment[];
   animated: boolean;
+  mounted: boolean;
 };
 
-function CommentList({ comments, onLike, animated }: CommentListProps) {
+function CommentList({ comments, animated, mounted }: CommentListProps) {
   const items = comments.map((comment, index) => {
+    const timeLabel =
+      mounted && comment.createdAt ? formatCommentTimeAgo(comment.createdAt) : "Just now";
+
     const row = (
       <>
         <ListItem
@@ -86,6 +124,7 @@ function CommentList({ comments, onLike, animated }: CommentListProps) {
         >
           <ListItemAvatar>
             <Avatar
+              src={comment.userAvatar ?? undefined}
               sx={{
                 width: 48,
                 height: 48,
@@ -94,7 +133,7 @@ function CommentList({ comments, onLike, animated }: CommentListProps) {
                 fontWeight: 600,
               }}
             >
-              {comment.avatar}
+              {getAvatarLabel(comment)}
             </Avatar>
           </ListItemAvatar>
           <ListItemText
@@ -104,10 +143,10 @@ function CommentList({ comments, onLike, animated }: CommentListProps) {
                   variant="subtitle2"
                   sx={{ fontWeight: 600, color: "text.primary" }}
                 >
-                  {comment.user}
+                  {comment.userName}
                 </Typography>
                 <Typography variant="caption" sx={{ color: "text.disabled" }}>
-                  • {comment.time}
+                  • {timeLabel}
                 </Typography>
               </Box>
             }
@@ -116,20 +155,6 @@ function CommentList({ comments, onLike, animated }: CommentListProps) {
                 <Typography variant="body2" sx={{ color: "text.secondary", mb: 1 }}>
                   {comment.text}
                 </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <IconButton
-                    size="small"
-                    onClick={() => onLike(comment.id)}
-                    sx={{
-                      color: comment.isLiked ? "#f43f5e" : "text.secondary",
-                    }}
-                  >
-                    {comment.isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                  </IconButton>
-                  <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                    {comment.likes}
-                  </Typography>
-                </Box>
               </Box>
             }
           />
@@ -164,51 +189,105 @@ function CommentList({ comments, onLike, animated }: CommentListProps) {
   return <AnimatePresence initial={false}>{items}</AnimatePresence>;
 }
 
-export function CommentsSection() {
+type CommentsSectionProps = {
+  artworkId: string;
+};
+
+export function CommentsSection({ artworkId }: CommentsSectionProps) {
+  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const [comments, setComments] = useState<Comment[]>(INITIAL_COMMENTS);
+  const [comments, setComments] = useState<FirestoreComment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(true);
   const [newComment, setNewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleLike = (id: number) => {
-    setComments((prev) =>
-      prev.map((comment) =>
-        comment.id === id
-          ? {
-              ...comment,
-              likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1,
-              isLiked: !comment.isLiked,
-            }
-          : comment
-      )
-    );
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadComments() {
+      if (!artworkId) {
+        setComments([]);
+        setLoadingComments(false);
+        return;
+      }
+
+      setLoadingComments(true);
+      try {
+        const commentsQuery = query(
+          collection(db, COMMENTS_COLLECTION),
+          where("artworkId", "==", artworkId),
+          orderBy("createdAt", "desc")
+        );
+        const snapshot = await getDocs(commentsQuery);
+
+        if (cancelled) return;
+
+        const items = snapshot.docs
+          .map((docSnap) => parseCommentDoc(docSnap.id, docSnap.data()))
+          .filter((item): item is FirestoreComment => item !== null);
+        setComments(items);
+      } finally {
+        if (!cancelled) {
+          setLoadingComments(false);
+        }
+      }
+    }
+
+    void loadComments();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [artworkId]);
+
+  const handleSubmit = async () => {
+    const text = newComment.trim();
+    if (!text || !user || submitting) return;
+
+    setSubmitting(true);
+    try {
+      await addDoc(collection(db, COMMENTS_COLLECTION), {
+        artworkId,
+        userId: user.uid,
+        userName: user.displayName ?? "Anonymous User",
+        userAvatar: user.photoURL ?? null,
+        text,
+        createdAt: serverTimestamp(),
+      });
+
+      const commentsQuery = query(
+        collection(db, COMMENTS_COLLECTION),
+        where("artworkId", "==", artworkId),
+        orderBy("createdAt", "desc")
+      );
+      const snapshot = await getDocs(commentsQuery);
+      const items = snapshot.docs
+        .map((docSnap) => parseCommentDoc(docSnap.id, docSnap.data()))
+        .filter((item): item is FirestoreComment => item !== null);
+      setComments(items);
+      setNewComment("");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleSubmit = () => {
-    if (!newComment.trim()) return;
+  const inputDisabled = !user || submitting;
+  const inputPlaceholder = user
+    ? "Share your thoughts about this artwork..."
+    : "Login to add a comment";
 
-    setComments((prev) => [
-      {
-        id: prev.length > 0 ? Math.max(...prev.map((c) => c.id)) + 1 : 1,
-        user: "you",
-        avatar: "YO",
-        text: newComment.trim(),
-        time: "Just now",
-        likes: 0,
-        isLiked: false,
-      },
-      ...prev,
-    ]);
-    setNewComment("");
-  };
-
-  const sendButton = (
+  const sendButton = submitting ? (
+    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 1 }}>
+      <CircularProgress size={18} />
+    </Box>
+  ) : (
     <IconButton
       onClick={handleSubmit}
-      disabled={!newComment.trim()}
+      disabled={!newComment.trim() || inputDisabled}
       sx={{
         background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
         color: "white",
@@ -238,9 +317,10 @@ export function CommentsSection() {
           fullWidth
           multiline
           rows={3}
-          placeholder="Share your thoughts about this artwork..."
+          placeholder={inputPlaceholder}
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
+          disabled={inputDisabled}
           slotProps={{
             input: {
               endAdornment: (
@@ -264,13 +344,19 @@ export function CommentsSection() {
         />
       </Box>
 
-      <List sx={{ p: 0 }}>
-        <CommentList
-          comments={comments}
-          onLike={handleLike}
-          animated={mounted}
-        />
-      </List>
+      {loadingComments ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
+          <CircularProgress size={26} />
+        </Box>
+      ) : (
+        <List sx={{ p: 0 }}>
+          <CommentList
+            comments={comments}
+            animated={mounted}
+            mounted={mounted}
+          />
+        </List>
+      )}
     </GlassCard>
   );
 }

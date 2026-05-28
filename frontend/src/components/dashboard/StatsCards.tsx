@@ -1,7 +1,6 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -9,39 +8,68 @@ import PaletteIcon from "@mui/icons-material/Palette";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
+import { ArtworksLoadState } from "@/src/components/home/ArtworksLoadState";
 import { GlassCard } from "@/src/components/ui/GlassCard";
+import { useUserArtworks } from "@/src/hooks/useUserArtworks";
+import {
+  formatArtworkCreatedDate,
+  formatArtworkPrice,
+} from "@/src/lib/firestore/artworks";
 
-export function StatsCards() {
+type StatsCardsProps = {
+  userId?: string;
+};
+
+export function StatsCards({ userId }: StatsCardsProps) {
+  const { artworks, loading, error } = useUserArtworks(userId);
+  const totalUploads = artworks.length;
+  const totalValue = artworks.reduce((sum, artwork) => sum + (artwork.price ?? 0), 0);
+  const latestUpload = artworks[0];
+
   const stats = [
     {
-      label: "Total Sales",
-      value: "$12,450",
-      change: "+23%",
+      label: "Total Uploads",
+      value: String(totalUploads),
+      change: totalUploads > 0 ? "Active" : "Start",
       icon: <AttachMoneyIcon />,
       color: "#667eea",
     },
     {
-      label: "Artworks",
-      value: "156",
-      change: "+12%",
+      label: "Total Artwork Value",
+      value: formatArtworkPrice(totalValue),
+      change: totalValue > 0 ? "USD" : "—",
       icon: <PaletteIcon />,
       color: "#764ba2",
     },
     {
-      label: "Likes",
-      value: "45.2K",
-      change: "+18%",
+      label: "Latest Upload",
+      value: latestUpload?.title ?? "No uploads",
+      change: latestUpload
+        ? formatArtworkCreatedDate(latestUpload.createdAt)
+        : "—",
       icon: <FavoriteIcon />,
       color: "#f093fb",
     },
     {
-      label: "Views",
-      value: "125K",
-      change: "+31%",
+      label: "Categories Used",
+      value: String(
+        new Set(artworks.map((artwork) => artwork.category).filter(Boolean)).size
+      ),
+      change: "Unique",
       icon: <TrendingUpIcon />,
       color: "#4ecdc4",
     },
   ];
+
+  if (loading || error) {
+    return (
+      <ArtworksLoadState
+        loading={loading}
+        error={error}
+        isEmpty={false}
+      />
+    );
+  }
 
   return (
     <Box

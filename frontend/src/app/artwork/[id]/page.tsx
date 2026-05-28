@@ -57,7 +57,7 @@ export default function ArtworkDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { artwork, loading, error } = useArtworkById(id);
+  const { artwork, loading, error, refetch } = useArtworkById(id);
 
   if (!id) {
     return (
@@ -150,7 +150,18 @@ export default function ArtworkDetailsPage({
               </motion.div>
 
               <motion.div variants={fadeInUp}>
-                <ActionButtons priceLabel={priceLabel} />
+                <ActionButtons
+                  priceLabel={priceLabel}
+                  artworkId={artwork.id}
+                  artworkOwnerId={artwork.artistId}
+                  initialValues={{
+                    title: artwork.title,
+                    description: artwork.description,
+                    category: artwork.category,
+                    price: artwork.price,
+                  }}
+                  onUpdated={refetch}
+                />
               </motion.div>
 
               <motion.div variants={fadeInUp}>
@@ -158,7 +169,7 @@ export default function ArtworkDetailsPage({
               </motion.div>
 
               <motion.div variants={fadeInUp}>
-                <CommentsSection />
+                <CommentsSection artworkId={artwork.id} />
               </motion.div>
             </Box>
 

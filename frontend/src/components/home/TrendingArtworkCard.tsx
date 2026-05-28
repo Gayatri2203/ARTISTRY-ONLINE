@@ -2,12 +2,17 @@
 
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { memo } from "react";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 import { MotionBox } from "@/src/components/ui";
+import { useArtworkLikes } from "@/src/hooks/useArtworkLikes";
 import { scaleIn } from "@/src/lib/motion";
 import { tapLinkStyle } from "@/src/components/ui/styles";
 
@@ -31,6 +36,9 @@ function TrendingArtworkCardComponent({
   const mediaHeight = featured
     ? { xs: 280, sm: 360, md: 420 }
     : { xs: 200, sm: 220, md: 240 };
+  const { likesCount, isLiked, toggling, canLike, toggleLike } = useArtworkLikes(
+    artwork.id
+  );
 
   return (
     <MotionBox
@@ -84,6 +92,33 @@ function TrendingArtworkCardComponent({
               />
             )}
             <ArtworkHoverOverlay title={artwork.title} price={artwork.price} />
+            <IconButton
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                void toggleLike();
+              }}
+              disabled={!canLike || toggling}
+              size="small"
+              sx={{
+                position: "absolute",
+                bottom: 12,
+                right: 12,
+                zIndex: 2,
+                bgcolor: "rgba(0,0,0,0.45)",
+                backdropFilter: "blur(10px)",
+                color: isLiked ? "#f43f5e" : "white",
+                "&:hover": { bgcolor: "rgba(0,0,0,0.6)" },
+              }}
+            >
+              {toggling ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : isLiked ? (
+                <FavoriteIcon fontSize="small" />
+              ) : (
+                <FavoriteBorderIcon fontSize="small" />
+              )}
+            </IconButton>
           </Box>
 
           <Stack spacing={1.5} sx={{ p: { xs: 2, sm: 2.5 } }}>
@@ -109,7 +144,7 @@ function TrendingArtworkCardComponent({
                 gap: 1,
               }}
             >
-              <ArtworkMetrics likes={artwork.likes} views={artwork.views} />
+              <ArtworkMetrics likes={likesCount} views={artwork.views} />
               <Typography
                 variant="subtitle1"
                 color="secondary.main"
