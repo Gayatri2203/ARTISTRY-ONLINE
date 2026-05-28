@@ -68,13 +68,12 @@ export function useUserArtworks(userId: string | undefined) {
 
   useEffect(() => {
     if (!userId) {
-      setArtworks([]);
-      setLoading(false);
-      setError(null);
       return;
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setError(null);
 
     const artworksQuery = query(
@@ -103,5 +102,9 @@ export function useUserArtworks(userId: string | undefined) {
     return () => unsubscribe();
   }, [userId]);
 
-  return { artworks, loading, error };
+  return {
+    artworks: userId ? artworks : [],
+    loading: userId ? loading : false,
+    error: userId ? error : null,
+  };
 }

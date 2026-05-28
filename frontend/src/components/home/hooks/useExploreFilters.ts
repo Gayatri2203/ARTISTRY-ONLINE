@@ -46,7 +46,7 @@ export function useExploreFilters(
   const filteredArtworks = useMemo(() => {
     const query = filters.query.trim().toLowerCase();
 
-    let results = sourceArtworks.filter((artwork) => {
+    const results = sourceArtworks.filter((artwork) => {
       const matchesQuery =
         !query ||
         artwork.title.toLowerCase().includes(query) ||

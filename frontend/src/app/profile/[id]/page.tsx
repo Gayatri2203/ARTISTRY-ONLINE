@@ -2,13 +2,13 @@
 
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
+import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import { use, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, orderBy, query, where } from "firebase/firestore";
 
 import { AppShell } from "@/src/components/layout/AppShell";
 import { GlassCard } from "@/src/components/ui/GlassCard";
@@ -26,6 +26,19 @@ type ArtistArtwork = {
   price: number | null;
   imageUrl: string;
   createdAt: number | null;
+};
+
+type UserProfileDoc = {
+  uid: string;
+  displayName?: string;
+  bio?: string;
+  avatarUrl?: string;
+  email?: string;
+  socialLinks?: {
+    website?: string;
+    instagram?: string;
+    twitter?: string;
+  };
 };
 
 function parseCreatedAt(value: unknown): number | null {
@@ -67,6 +80,7 @@ export default function ArtistProfilePage({
   const [artworks, setArtworks] = useState<ArtistArtwork[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<UserProfileDoc | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -82,6 +96,11 @@ export default function ArtistProfilePage({
       setError(null);
 
       try {
+        const userSnapshot = await getDoc(doc(db, "users", profileId));
+        if (!cancelled && userSnapshot.exists()) {
+          setProfile(userSnapshot.data() as UserProfileDoc);
+        }
+
         const artworksQuery = query(
           collection(db, "artworks"),
           where("artistId", "==", profileId),
@@ -130,11 +149,13 @@ export default function ArtistProfilePage({
 
   const artistName = getArtistName(
     profileId,
-    user?.uid === profileId ? user.displayName : null
+    profile?.displayName ?? (user?.uid === profileId ? user.displayName : null)
   );
   const artistEmail =
-    user?.uid === profileId && user.email ? user.email : "Email not available";
-  const avatarSrc = user?.uid === profileId ? user.photoURL : null;
+    profile?.email ??
+    (user?.uid === profileId && user.email ? user.email : "Email not available");
+  const avatarSrc =
+    profile?.avatarUrl ?? (user?.uid === profileId ? user.photoURL : null);
   const totalUploads = artworks.length;
 
   const cardItems: ArtworkItem[] = artworks.map((artwork) => ({
@@ -200,6 +221,11 @@ export default function ArtistProfilePage({
                   <Typography variant="body2" sx={{ color: "text.secondary", mt: 1.5 }}>
                     Total uploads: {totalUploads}
                   </Typography>
+                  {profile?.bio && (
+                    <Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
+                      {profile.bio}
+                    </Typography>
+                  )}
                 </Box>
               </Box>
             </GlassCard>
@@ -212,9 +238,13 @@ export default function ArtistProfilePage({
               </Typography>
 
               {loading && (
-                <Box sx={{ py: 8, display: "flex", justifyContent: "center" }}>
-                  <CircularProgress size={34} />
-                </Box>
+                <Grid container spacing={2}>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+                      <Skeleton variant="rounded" height={240} />
+                    </Grid>
+                  ))}
+                </Grid>
               )}
 
               {!loading && error && (

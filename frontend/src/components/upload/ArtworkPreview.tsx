@@ -2,12 +2,25 @@
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { useEffect, useState } from "react";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
 import { useUploadContext } from "@/src/features/upload/UploadContext";
 
 export function ArtworkPreview() {
-  const { imageFile, artworkData } = useUploadContext();
+  const { imageFile } = useUploadContext();
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!imageFile) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(imageFile);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [imageFile]);
 
   return (
     <GlassCard sx={{ p: 3 }}>
@@ -32,9 +45,9 @@ export function ArtworkPreview() {
           mb: 3,
         }}
       >
-        {imageFile ? (
+        {previewUrl ? (
           <img
-            src={URL.createObjectURL(imageFile)}
+            src={previewUrl}
             alt="Artwork Preview"
             style={{
               width: "100%",
@@ -62,7 +75,7 @@ export function ArtworkPreview() {
             variant="body1"
             sx={{ color: "text.primary", fontWeight: 500 }}
           >
-            {artworkData?.title || "Your Artwork Title"}
+            Your Artwork Title
           </Typography>
         </Box>
 
@@ -78,7 +91,7 @@ export function ArtworkPreview() {
             variant="body2"
             sx={{ color: "text.secondary" }}
           >
-            {artworkData?.category || "Digital Art"}
+            Digital Art
           </Typography>
         </Box>
 
@@ -97,7 +110,7 @@ export function ArtworkPreview() {
               fontWeight: 700,
             }}
           >
-            ${artworkData?.price || "0.00"}
+            $0.00
           </Typography>
         </Box>
       </Box>

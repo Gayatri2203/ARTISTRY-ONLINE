@@ -75,11 +75,10 @@ function LoginFormInner() {
       );
       router.push(redirect);
   
-    } catch (error: any) {
-  
-      console.log(error);
-  
-      toast.error( error.message || "Login failed");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Login failed";
+      toast.error(message);
 
     }
   };

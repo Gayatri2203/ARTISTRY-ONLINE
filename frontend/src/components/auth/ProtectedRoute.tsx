@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 import Box from "@mui/material/Box";
@@ -31,11 +31,7 @@ export function ProtectedRoute({
   const router = useRouter();
   const pathname = usePathname();
   const { user, loading } = useAuth();
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+  const isHydrated = typeof window !== "undefined";
 
   useEffect(() => {
     if (!isHydrated || loading || user) return;

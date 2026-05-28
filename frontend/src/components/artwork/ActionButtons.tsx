@@ -18,7 +18,7 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import ShareIcon from "@mui/icons-material/Share";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { useRouter } from "next/navigation";
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
@@ -233,7 +233,7 @@ export function ActionButtons({
               variant="glass"
               color="error"
               fullWidth
-              startIcon={<DeleteOutlineIcon />}
+              startIcon={<DeleteOutlinedIcon />}
               onClick={() => {
                 setFormError(null);
                 setDeleteOpen(true);

@@ -2,7 +2,7 @@
 
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { useBodyScrollLock } from "./useBodyScrollLock";
 import { useEscapeKey } from "./useEscapeKey";
@@ -13,21 +13,21 @@ type UseMobileNavResult = {
   close: () => void;
 };
 
-/** Mobile navigation drawer state with scroll lock, escape key, and desktop auto-close. */
+/** Mobile navigation drawer state with scroll lock and escape key. */
 export function useMobileNav(): UseMobileNavResult {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme();
   const isMobileViewport = useMediaQuery(theme.breakpoints.down("md"));
 
-  const open = useCallback(() => setIsOpen(true), []);
+  const open = useCallback(() => {
+    if (isMobileViewport) {
+      setIsOpen(true);
+    }
+  }, [isMobileViewport]);
   const close = useCallback(() => setIsOpen(false), []);
 
   useBodyScrollLock(isOpen);
   useEscapeKey(isOpen, close);
 
-  useEffect(() => {
-    if (!isMobileViewport && isOpen) setIsOpen(false);
-  }, [isMobileViewport, isOpen]);
-
-  return { isOpen, open, close };
+  return { isOpen: isMobileViewport ? isOpen : false, open, close };
 }

@@ -3,6 +3,7 @@
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import InputAdornment from "@mui/material/InputAdornment";
+import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -58,7 +59,7 @@ export default function FeaturedArtworksSection() {
 
   const loadState = (
     <ArtworksLoadState
-      loading={loading}
+      loading={false}
       error={error}
       isEmpty={!loading && !error && featuredArtworks.length === 0}
     />
@@ -100,6 +101,21 @@ export default function FeaturedArtworksSection() {
       </Stack>
 
       {loadState}
+
+      {loading && (
+        <Grid container spacing={sectionGridSpacing}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+              <Stack spacing={1.25}>
+                <Skeleton variant="rounded" height={220} />
+                <Skeleton variant="text" height={28} />
+                <Skeleton variant="text" width="60%" />
+                <Skeleton variant="text" width="40%" />
+              </Stack>
+            </Grid>
+          ))}
+        </Grid>
+      )}
 
       {!loading && !error && featuredArtworks.length > 0 && (
         <>

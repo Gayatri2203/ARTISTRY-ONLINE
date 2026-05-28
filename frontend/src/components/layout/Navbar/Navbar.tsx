@@ -10,6 +10,7 @@ import Toolbar from "@mui/material/Toolbar";
 import { AuthNavButtons } from "@/src/components/layout/Navbar/AuthNavButtons";
 import { DesktopNavLinks } from "@/src/components/layout/Navbar/DesktopNavLinks";
 import { MobileNavDrawer } from "@/src/components/layout/Navbar/MobileNavDrawer";
+import { NotificationsMenu } from "@/src/components/layout/Navbar/NotificationsMenu";
 import { ProfileMenu } from "@/src/components/layout/Navbar/ProfileMenu";
 import Logo from "@/src/components/layout/Logo";
 import { NAV_LINKS } from "@/src/features/landing/data";
@@ -51,7 +52,10 @@ export default function Navbar() {
               sx={{ ml: "auto", display: { xs: "none", md: "flex" }, alignItems: "center" }}
             >
               {isAuthenticated ? (
-                <ProfileMenu />
+                <>
+                  <NotificationsMenu />
+                  <ProfileMenu />
+                </>
               ) : (
                 <AuthNavButtons />
               )}
@@ -78,7 +82,7 @@ export default function Navbar() {
         open={isOpen}
         onClose={close}
         isLoggedIn={isAuthenticated}
-        username={user?.username}
+        username={user?.displayName ?? user?.email?.split("@")[0] ?? "user"}
       />
     </>
   );

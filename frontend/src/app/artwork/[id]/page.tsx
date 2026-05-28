@@ -1,8 +1,8 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
+import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import { use } from "react";
 import { motion } from "framer-motion";
@@ -25,11 +25,27 @@ import { fadeInUp, staggerContainer } from "@/src/lib/motion";
 
 function ArtworkLoadingState() {
   return (
-    <Container maxWidth="lg" sx={{ py: 8, textAlign: "center" }}>
-      <CircularProgress size={40} />
-      <Typography variant="body2" sx={{ color: "text.secondary", mt: 2 }}>
-        Loading artwork…
-      </Typography>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ mb: 3 }}>
+        <Skeleton variant="text" height={52} width="45%" />
+        <Skeleton variant="text" height={28} width="28%" />
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", lg: "row" },
+          gap: 3,
+        }}
+      >
+        <Box sx={{ flex: { xs: 1, lg: 1.5 } }}>
+          <Skeleton variant="rounded" height={340} />
+          <Skeleton variant="rounded" height={140} sx={{ mt: 3 }} />
+          <Skeleton variant="rounded" height={230} sx={{ mt: 3 }} />
+        </Box>
+        <Box sx={{ flex: { xs: 1, lg: 1 } }}>
+          <Skeleton variant="rounded" height={320} />
+        </Box>
+      </Box>
     </Container>
   );
 }
@@ -169,7 +185,11 @@ export default function ArtworkDetailsPage({
               </motion.div>
 
               <motion.div variants={fadeInUp}>
-                <CommentsSection artworkId={artwork.id} />
+                <CommentsSection
+                  artworkId={artwork.id}
+                  artworkTitle={artwork.title}
+                  artworkOwnerId={artwork.artistId}
+                />
               </motion.div>
             </Box>
 

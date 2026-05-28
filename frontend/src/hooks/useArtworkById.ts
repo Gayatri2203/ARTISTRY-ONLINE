@@ -38,6 +38,7 @@ export function useArtworkById(id: string | undefined) {
   }, [id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadArtwork();
   }, [loadArtwork]);
 

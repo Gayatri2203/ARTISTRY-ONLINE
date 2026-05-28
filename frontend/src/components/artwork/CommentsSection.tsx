@@ -10,6 +10,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
+import Skeleton from "@mui/material/Skeleton";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
@@ -29,6 +30,7 @@ import {
 
 import { GlassCard } from "@/src/components/ui/GlassCard";
 import { useAuth } from "@/src/context/AuthContext";
+import { createNotification } from "@/src/lib/firestore/notifications";
 import { db } from "@/src/lib/firebase";
 
 type FirestoreComment = {
@@ -191,19 +193,21 @@ function CommentList({ comments, animated, mounted }: CommentListProps) {
 
 type CommentsSectionProps = {
   artworkId: string;
+  artworkTitle: string;
+  artworkOwnerId?: string;
 };
 
-export function CommentsSection({ artworkId }: CommentsSectionProps) {
+export function CommentsSection({
+  artworkId,
+  artworkTitle,
+  artworkOwnerId,
+}: CommentsSectionProps) {
   const { user } = useAuth();
-  const [mounted, setMounted] = useState(false);
+  const mounted = typeof window !== "undefined";
   const [comments, setComments] = useState<FirestoreComment[]>([]);
   const [loadingComments, setLoadingComments] = useState(true);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -257,6 +261,16 @@ export function CommentsSection({ artworkId }: CommentsSectionProps) {
         userAvatar: user.photoURL ?? null,
         text,
         createdAt: serverTimestamp(),
+      });
+
+      await createNotification({
+        recipientUserId: artworkOwnerId ?? "",
+        senderUserId: user.uid,
+        senderName: user.displayName ?? user.email?.split("@")[0] ?? "Someone",
+        senderAvatar: user.photoURL ?? "",
+        type: "comment",
+        artworkId,
+        artworkTitle: artworkTitle || "your artwork",
       });
 
       const commentsQuery = query(
@@ -345,9 +359,25 @@ export function CommentsSection({ artworkId }: CommentsSectionProps) {
       </Box>
 
       {loadingComments ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
-          <CircularProgress size={26} />
-        </Box>
+        <List sx={{ p: 0 }}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <Box key={index}>
+              <ListItem sx={{ px: 0, py: 2 }}>
+                <ListItemAvatar>
+                  <Skeleton variant="circular" width={48} height={48} />
+                </ListItemAvatar>
+                <Box sx={{ flex: 1 }}>
+                  <Skeleton variant="text" width="45%" />
+                  <Skeleton variant="text" width="95%" />
+                  <Skeleton variant="text" width="60%" />
+                </Box>
+              </ListItem>
+              {index < 2 && (
+                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.05)" }} />
+              )}
+            </Box>
+          ))}
+        </List>
       ) : (
         <List sx={{ p: 0 }}>
           <CommentList

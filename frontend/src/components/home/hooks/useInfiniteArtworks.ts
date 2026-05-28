@@ -31,6 +31,7 @@ export function useInfiniteArtworks({
   }, [hasMore, isLoadingMore, items.length, pageSize]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisibleCount(pageSize);
   }, [items, pageSize]);
 

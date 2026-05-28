@@ -5,6 +5,8 @@ import {
   addDoc,
   collection,
   deleteDoc,
+  doc,
+  getDoc,
   onSnapshot,
   query,
   serverTimestamp,
@@ -13,6 +15,7 @@ import {
 } from "firebase/firestore";
 
 import { useAuth } from "@/src/context/AuthContext";
+import { createNotification } from "@/src/lib/firestore/notifications";
 import { db } from "@/src/lib/firebase";
 
 const LIKES_COLLECTION = "likes" as const;
@@ -28,8 +31,11 @@ export function useArtworkLikes(artworkId: string) {
 
   useEffect(() => {
     if (!artworkId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLikesCount(0);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLiked(false);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }
@@ -82,6 +88,25 @@ export function useArtworkLikes(artworkId: string) {
         userId: user.uid,
         createdAt: serverTimestamp(),
       });
+
+      const artworkDoc = await getDoc(doc(db, "artworks", artworkId));
+      if (artworkDoc.exists()) {
+        const artworkData = artworkDoc.data();
+        const recipientUserId =
+          typeof artworkData.artistId === "string" ? artworkData.artistId : "";
+        const artworkTitle =
+          typeof artworkData.title === "string" ? artworkData.title : "your artwork";
+
+        await createNotification({
+          recipientUserId,
+          senderUserId: user.uid,
+          senderName: user.displayName ?? user.email?.split("@")[0] ?? "Someone",
+          senderAvatar: user.photoURL ?? "",
+          type: "like",
+          artworkId,
+          artworkTitle,
+        });
+      }
     } finally {
       setToggling(false);
     }

@@ -103,7 +103,7 @@ function DashboardPageContent() {
               Dashboard
             </Typography>
             <Typography variant="body1" sx={{ color: "text.secondary", mb: 3 }}>
-              Welcome back! Here's your overview
+              Welcome back! Here&apos;s your overview
             </Typography>
           </motion.div>
 

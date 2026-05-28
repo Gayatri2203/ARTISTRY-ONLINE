@@ -83,11 +83,10 @@ export default function SignupForm() {
         `Account created. Welcome, ${data.name.split(" ")[0]}!`
       );
       router.push(ROUTES.dashboard);
-    } catch (error: any) {
-  
-      console.log(error);
-  
-      toast.error(error.message || "Registration failed");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Registration failed";
+      toast.error(message);
 
     }
   };
