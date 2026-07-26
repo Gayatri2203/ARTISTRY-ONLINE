@@ -156,7 +156,7 @@ Bachelor of Engineering (Computer Engineering)
 
 Passionate about Web Development, Java, React, Next.js, Firebase, and building user-friendly applications.
 
-GitHub: https://github.com/your-username
+GitHub: https://github.com/Gayatri2203
 
 ---
 
