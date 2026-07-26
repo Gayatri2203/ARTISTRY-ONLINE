@@ -163,7 +163,7 @@ This project helped me gain practical experience in:
 
 # 👩‍💻 Author
 
-**Gayatri Potdar**
+**Gayatri Potdar** and **Lavanya Patil**
 
 Bachelor of Engineering (Computer Engineering)
 
