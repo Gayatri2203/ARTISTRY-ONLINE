@@ -115,20 +115,7 @@ npm run dev
 
 ---
 
-# 📸 Screenshots
 
-You can add screenshots here later.
-
-Example:
-
-```
-/screenshots
-    home.png
-    dashboard.png
-    artwork-details.png
-```
-
----
 
 # 📚 Learning Outcomes
 
